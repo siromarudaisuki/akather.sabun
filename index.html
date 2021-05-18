@@ -170,15 +170,9 @@ function makeBMSTable(info, mark, order) {
         // レベル表記
         $("<td width='1%'>" + mark + x + "</td>").appendTo(str);
         // 動画
-		if(info[i].video1 != "" && info[i].video1 != null){
-			// ニコニコ(!)
-			$("<td width='1%' align='center'><a href='http://www.nicovideo.jp/watch/sm" + info[i].video1 + "' target='_blank'><img src='style/nico.gif' border='0' alt='ニコニコ動画' /></a></td>").appendTo(str);
-		} else if(info[i].video2 != "" && info[i].video2 != null){
-			// YouTube(2)
-			$("<td width='1%' align='center'><a href= info[i].video2 + "' target='_blank'><img src='style/youtube.gif' border='0' alt='Youtube' /></a></td>").appendTo(str);
-		} else if(info[i].video3 != "" && info[i].video3 != null){
-			// vimeo
-			$("<td width='1%' align='center'><a href='http://vimeo.com/" + info[i].video3 + "' target='_blank'><img src='style/vimeo.gif' border='0' alt='vimeo' /></a></td>").appendTo(str);
+		if(info[i].video2 != "" && info[i].video2 != null){
+			// YouTube
+			$("<td width='1%' align='center'><a href= '"' + info[i].youtube + "' target='_blank'><img src='style/youtube.gif' border='0' alt='Youtube' /></a></td>").appendTo(str);
 		} else {
         	$("<td width='1%'></td>").appendTo(str);
 		}
