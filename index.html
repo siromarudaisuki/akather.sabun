@@ -172,7 +172,7 @@ function makeBMSTable(info, mark, order) {
         // 動画
 		if(info[i].youtube != "" && info[i].youtube != null){
 			// YouTube
-			$("<td width='1%' align='center'><a href=' + info[i].youtube + "' target='_blank'><img src='style/youtube.gif' border='0' alt='Youtube' /></a></td>").appendTo(str);
+			$("<td width='1%' align='center'><a href=info[i].youtube + "' target='_blank'><img src='style/youtube.gif' border='0' alt='Youtube' /></a></td>").appendTo(str);
 		} else {
         	$("<td width='1%'></td>").appendTo(str);
 		}
