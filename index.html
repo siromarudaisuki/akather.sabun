@@ -3,7 +3,10 @@
 
 <head>
 <title>差分置き場</title>
-<link rel="shortcut icon" href="icon/48.png" type="image/png">
+<!-- icon設定 -->
+<link rel="icon" href="icon/120.png" type="image/png">
+<link rel="apple-touch-icon" sizes="120x120" href="icon/120.png">
+	
 	
 <meta http-equiv="Content-Script-Type" content="text/javascript" />
 <meta http-equiv="Content-Style-Type" content="text/css" />
@@ -18,8 +21,8 @@
 <center>
 <strong><span style="font-size: 24pt;">差分置き場</span></strong><br>
 <br>
-<strong><span style="font-size: 12pt;">雑に作っただけなので見づらいのは許して；；</span></strong><br> 
-<a href="http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=mypage&playerid=167171&guestmode=1">IR(まいぺーじ)</a><br>
+<strong><span style="font-size: 12pt;">雑に作っただけ</span></strong><br> 
+<a href="http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=mypage&playerid=167171&guestmode=1" target="_blank" rel="noopener noreferrer" >IR(まいぺーじ)</a><br>
 </center>
 
 <br>
@@ -124,7 +127,7 @@ function makeBMSTable(info, mark, order) {
 	
     // 表のクリア
     obj.html("");
-    $("<tr height='20' style='color:white;background-color:#666666'><td align='center'>LV</td><td align='center'>動画</td><td align='center'>譜面</td><td align='center'>タイトル(IRリンク)</td><td align='center'>作者(本体リンク)</td><td align='center'>差分</td><td align='center'>BPM</td><td align='center'>total</td><td align='center'>コメント</td></tr>").appendTo(obj);
+    $("<tr height='20' style='color:white;background-color:#666666'><td align='center'>LV</td><td align='center'>動<br>画</td><td align='center'>譜<br>面</td><td align='center'>タイトル<br>(IRリンク)</td><td align='center'>作者<br>(本体リンク)</td><td align='center'>差分</td><td align='center'>BPM</td><td align='center'>total</td><td align='center'>コメント</td></tr>").appendTo(obj);
     var obj_sep = null;
     for (var i = 0; i < info.length; i++) {
         // 難度ごとの区切り
@@ -138,6 +141,7 @@ function makeBMSTable(info, mark, order) {
             count = 0;
             x = info[i].level;
         }
+
         // 本文
         var str = $("<tr class='tr_normal'></tr>");
 
@@ -182,7 +186,7 @@ function makeBMSTable(info, mark, order) {
 
         // タイトル
 		if(info[i].state != ""){
-			$("<td width='13%'>" + "<a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + info[i].md5 + "' target='_blank'>" + info[i].title + " ＊新規追加＊" + "</a></td>").appendTo(str);
+			$("<td width='13%'>" + "<a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + info[i].md5 + "' target='_blank'>" + info[i].title + " <br>＊新規追加＊" + "</a></td>").appendTo(str);
 		}
         else{ 
 		$("<td width='13%'>" + "<a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + info[i].md5 + "' target='_blank'>" + info[i].title + "</a></td>").appendTo(str);
