@@ -170,12 +170,12 @@ function makeBMSTable(info, mark, order) {
         // レベル表記
         $("<td width='1%'>" + mark + x + "</td>").appendTo(str);
         // 動画
-		if(info[i].youtube != "" && info[i].youtube != null){
-			// YouTube
-			$("<td width='1%' align='center'><a href=info[i].youtube + "' target='_blank'><img src='style/youtube.gif' border='0' alt='Youtube' /></a></td>").appendTo(str);
-		} else {
+	//	if(info[i].youtube != "" && info[i].youtube != null){
+	//		// YouTube
+	//		$("<td width='1%' align='center'><a href=info[i].youtube + "' target='_blank'><img src='style/youtube.gif' border='0' alt='Youtube' /></a></td>").appendTo(str);
+	//	} else {
         	$("<td width='1%'></td>").appendTo(str);
-		}
+	//	}
 　　　　// 譜面画像
 　　　　$("<td width='1%' akign='center'><a href='http://www.ribbit.xyz/bms/score/view?p=1&md5=" + info[i].md5 + "' target='_blank'>■</a></td>").appendTo(str);
 
