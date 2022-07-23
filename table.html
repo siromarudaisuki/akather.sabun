@@ -51,7 +51,7 @@ function menu(tName){
 	}
 }
 
-
+// 'GASを使ってスプレッドシートからjsonに変換した差分情報'を取得
 $(document).ready(function(){
 	$.getJSON($("meta[name=bmstable]").attr("content"), function(header){
 		$.getJSON(header.data_url, function(information){
