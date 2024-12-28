@@ -200,10 +200,10 @@ function makeBMSTable(info, mark, order) {
 			// YouTube
 			$("<td width='1%' align='center'><a href='" + info[i].youtube + "' target='_blank'><img src='style/youtube.gif' border='0' alt='Youtube' /></a></td>").appendTo(str);
 		} 
-		else if(info[i].vimeo != "" && info[i].vimeo != null)
+		else if(info[i].video != "" && info[i].video != null)
 		{
 			// video
-			$("<td width='1%' align='center'><a href='http://vimeo.com/" + info[i].vimeo + "' target='_blank'><img src='style/vimeo.gif' border='0' alt='vimeo' /></a></td>").appendTo(str);
+			$("<td width='1%' align='center'><a href='http://video.com/" + info[i].video + "' target='_blank'><img src='style/video.gif' border='0' alt='video' /></a></td>").appendTo(str);
 		} 
 		else 
 		{
@@ -216,11 +216,21 @@ function makeBMSTable(info, mark, order) {
         // タイトル
 		if(info[i].state != "")
 		{
-			$("<td width='13%'>" + "<a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + info[i].md5 + "' target='_blank'>" + info[i].title + " <br>＊新規追加＊" + "</a></td>").appendTo(str);
+			if (info[i].state == 3) // 新規追加
+			{
+				$("<td width='13%'>" + "<a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" 
+				+ info[i].md5 + "' target='_blank'>" + info[i].title + " <br>＊新規追加＊" + "</a></td>").appendTo(str);
+			}
+			else if (info[i].state == 1) // 未公開
+			{
+				$("<td width='13%'>" + "<a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" 
+				+ info[i].md5 + "' target='_blank'>" + info[i].title + " <br>＊未公開＊" + "</a></td>").appendTo(str);
+			}
 		}
         else
 		{ 
-		$("<td width='13%'>" + "<a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + info[i].md5 + "' target='_blank'>" + info[i].title + "</a></td>").appendTo(str);
+			// 
+			$("<td width='13%'>" + "<a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + info[i].md5 + "' target='_blank'>" + info[i].title + "</a></td>").appendTo(str);
 		}
 		
 		// アーティスト
@@ -263,6 +273,7 @@ function makeBMSTable(info, mark, order) {
 			}
         }
         $("<td width='5%'>" + astr + "</td>").appendTo(str);
+
         // 差分
         // if(info[i].url_diff != "" && info[i].url_diff != null) {
         //	if(info[i].name_diff != "" && info[i].name_diff != null) {
@@ -278,7 +289,14 @@ function makeBMSTable(info, mark, order) {
         //	}
         //}
 		// levelとタイトル情報を使ってGithub上からDL
-		$("<td width='1%'><a href='sabun/★" + info[i].level + " " + info[i].title + ".zip'>" + "DL" + "</a></td>").appendTo(str);
+		if (info[i].state == 1)
+		{
+			$("<td width='1%'> </td>").appendTo(str);
+		}
+		else
+		{
+			$("<td width='1%'><a href='sabun/★" + info[i].level + " " + info[i].title + ".zip'>" + "DL" + "</a></td>").appendTo(str);
+		}
 
 		// BPM
 		$("<td width='1%'>" + info[i].bpm + "</div></td>").appendTo(str);
