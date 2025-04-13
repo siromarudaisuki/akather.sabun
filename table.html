@@ -149,16 +149,16 @@ function makeBMSTable(info, mark, order) {
     // カラムの見出し構築
     obj.html("");
     $("<tr height='20' style='color:white;background-color:#666666'>"
-		+"<td align='center'>LV</td>"
-		+"<td align='center'>動<br>画</td>"
-		+"<td align='center'>譜<br>面</td>"
-		+"<td align='center'>タイトル<br>(IRリンク)</td>"
-		+"<td align='center'>作者(敬称略)<br>(本体リンク)</td>"
-		+"<td align='center'>差分</td>"
-		+"<td align='center'>BPM</td>"
-		+"<td align='center'>total</td>"
-		+"<td align='center'>追加日時</td>"
-		+"<td align='center'>コメント</td>"
+		+"<td align='center' sortable>LV</td>"
+		+"<td align='center' sortable>動<br>画</td>"
+		+"<td align='center' sortable>譜<br>面</td>"
+		+"<td align='center' sortable>タイトル<br>(IRリンク)</td>"
+		+"<td align='center' sortable>作者(敬称略)<br>(本体リンク)</td>"
+		+"<td align='center' sortable>差分</td>"
+		+"<td align='center' sortable>BPM</td>"
+		+"<td align='center' sortable>total</td>"
+		+"<td align='center' sortable>追加日時</td>"
+		+"<td align='center' sortable>コメント</td>"
 		+"</tr>").appendTo(obj);
 
     let obj_sep = null;
