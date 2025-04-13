@@ -94,8 +94,9 @@ $(document).ready(function() {
             });
         }
     });
+});
 
-    function makeBMSTable(info, mark, order) {
+function makeBMSTable(info, mark, order) {
         if (typeof order === 'undefined') order = null;
 
         let obj = $("#table_int");
@@ -213,7 +214,6 @@ $(document).ready(function() {
             obj_sep.html("<td colspan='11' align='center'><b>" + mark + " " + x + " (" + count + "譜面)</b></td>");
         }
     }
-});
 </script>
 </body>
 </html>
