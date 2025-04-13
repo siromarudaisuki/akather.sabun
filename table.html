@@ -70,7 +70,82 @@ $(document).ready(function(){
 	});
 });
 
+function makeBMSTable(info, mark, order) {
+    if(typeof order === 'undefined') order = null;
 
+    let obj = $("#table_int");
+    obj.html("");
+
+    let headerRow = $("<tr height='20' style='color:white;background-color:#666666'></tr>");
+    let headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略)(本体リンク)", "差分", "BPM", "total", "追加日時", "コメント"];
+
+    headers.forEach((text, index) => {
+        let headerCell = $("<td align='center' sortable>" + text + "</td>");
+        headerCell.css("cursor", "pointer");
+        headerCell.on("click", function() {
+            let rows = obj.find("tr:gt(0)").toArray().sort(comparer(index));
+            this.asc = !this.asc;
+            if (!this.asc) { rows.reverse(); }
+            obj.append(rows);
+        });
+        headerRow.append(headerCell);
+    });
+
+    headerRow.appendTo(obj);
+
+    function comparer(index) {
+        return function(a, b) {
+            let valA = $(a).children("td").eq(index).text();
+            let valB = $(b).children("td").eq(index).text();
+
+            if ($.isNumeric(valA) && $.isNumeric(valB)) {
+                return valA - valB;
+            } else {
+                return valA.localeCompare(valB);
+            }
+        };
+    }
+
+    let obj_sep = null;
+    let x = "", count = 0;
+
+    for (let i = 0; i < info.length; i++) {
+        if (x != info[i].level) {
+            if (obj_sep != null) {
+                obj_sep.html("<td colspan='11' align='center'><b>" + mark + x + " (" + count + "譜面)</b></td>");
+            }
+            obj_sep = $("<tr class='tr_separate' id='" + mark + info[i].level + "'></tr>");
+            obj_sep.appendTo(obj);
+            count = 0;
+            x = info[i].level;
+        }
+
+        let str = $("<tr class='tr_normal'></tr>");
+        if(info[i].state) str = $("<tr class='state" + info[i].state + "'></tr>");
+
+        $("<td width='1%'>" + mark + x + "</td>").appendTo(str);
+        $("<td width='1%' align='center'>" + (info[i].youtube ? "<a href='" + info[i].youtube + "' target='_blank'><img src='style/youtube.gif' border='0' alt='Youtube' /></a>" : "") + "</td>").appendTo(str);
+        $("<td width='1%' align='center'><a href='https://bms-score-viewer.pages.dev/view?md5=" + info[i].md5 + "' target='_blank'>■</a></td>").appendTo(str);
+        $("<td width='13%'><a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + info[i].md5 + "' target='_blank'>" + info[i].title + "</a></td>").appendTo(str);
+        $("<td width='5%'>" + (info[i].artist ? "<a href='" + info[i].url + "' target='_blank'>" + info[i].artist + "</a>" : "") + "</td>").appendTo(str);
+        $("<td width='1%'><a href='sabun/★" + info[i].level + " " + info[i].title + ".zip'>DL</a></td>").appendTo(str);
+        $("<td width='1%'>" + info[i].bpm + "</td>").appendTo(str);
+        $("<td width='1%'>" + info[i].total + "/" + info[i].totalnote + "</td>").appendTo(str);
+        $("<td width='1%'>" + (info[i].year ? (info[i].year + "/" + (info[i].month || "") + "/" + (info[i].day || "")) : "('ω')｡o(?)") + "</td>").appendTo(str);
+        $("<td width='10%'>" + info[i].comment + "</td>").appendTo(str);
+
+        str.appendTo(obj);
+        count++;
+    }
+
+    if (obj_sep != null) {
+        obj_sep.html("<td colspan='11' align='center'><b>" + mark + x + " (" + count + "譜面)</b></td>");
+    }
+}
+
+
+// 過去の手書きコード
+/*
 // ソートのための引数追加
 function makeBMSTable(info, mark, order) {
 	// orderが未指定の場合はnull
@@ -165,18 +240,18 @@ function makeBMSTable(info, mark, order) {
     for (let i = 0; i < info.length; i++) 
 	{
         // 難度ごとの区切り
-        //if (x != info[i].level) 
-		//{
-        //    // 前の区切りに譜面数、平均密度を追加
-		//	if (obj_sep != null) 
-		//	{
-        //        obj_sep.html("<td colspan=11 align='center'>" + "<b>" + mark + x + " (" + count + "譜面)</b></td>");
-        //    }
-        //    obj_sep = $("<tr class='tr_separate' id='" + mark + info[i].level + "'></tr>");
-        //    obj_sep.appendTo(obj);
-        //    count = 0;
-        //    x = info[i].level;
-        //}
+        if (x != info[i].level) 
+		{
+            // 前の区切りに譜面数、平均密度を追加
+			// if (obj_sep != null) 
+			// {
+            //     obj_sep.html("<td colspan=11 align='center'>" + "<b>" + mark + x + " (" + count + "譜面)</b></td>");
+            // }
+            obj_sep = $("<tr class='tr_separate' id='" + mark + info[i].level + "'></tr>");
+            obj_sep.appendTo(obj);
+            count = 0;
+            x = info[i].level;
+        }
 
         // 本文
         let str = $("<tr class='tr_normal'></tr>");
@@ -342,6 +417,7 @@ function makeBMSTable(info, mark, order) {
         obj_sep.html("<td colspan='11' align='center'>" + "<b>" + mark + x + " (" + count + "譜面)</b></td>");
 	}
 }
+*/
 </script>
 
 
