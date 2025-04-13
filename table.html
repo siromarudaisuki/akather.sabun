@@ -106,7 +106,6 @@ $(document).ready(function() {
         let headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "差分", "BPM", "total", "追加日時", "コメント"];
         let sortableIndexes = ["LV", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "BPM", "total", "追加日時", "コメント"];
         let sortState = {};
-
         headers.forEach((text, index) => {
             let headerCell = $("<td align='center'>" + text + "</td>");
             if (sortableIndexes.includes(text)) {
@@ -200,7 +199,7 @@ $(document).ready(function() {
             $("<td width='1%'>DL</td>").appendTo(str);
             $("<td width='1%'>" + info[i].bpm + "</td>").appendTo(str);
             $("<td width='1%'>" + info[i].total + "/" + info[i].totalnote + "</td>").appendTo(str);
-            $("<td width='1%'>" + (info[i].year ? (info[i].year + "/" + (info[i].month || 0) + "/" + (info[i].day || 0)) : "('ω')｡o(?)") + "</td>").appendTo(str);
+            $("<td width='1%'>" + (info[i].year ? (info[i].year + "/" + (info[i].month || 0) + "/" + (info[i].day || 0)) : "<font color='#666666'>('ω')｡o(?)</font>") + "</td>").appendTo(str);
             $("<td width='10%'>" + info[i].comment + "</td>").appendTo(str);
 
             str.appendTo(obj);
