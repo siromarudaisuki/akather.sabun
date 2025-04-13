@@ -304,7 +304,14 @@ function makeBMSTable(info, mark, order) {
 		$("<td width='1%'>" + info[i].bpm + "</div></td>").appendTo(str);
 		// トータル
 		$("<td width='1%'>" + info[i].total + "/" + info[i].totalnote + "</div></td>").appendTo(str);
-
+		// 日付
+		if (info[i].year != null)
+		{
+			let text = info[i].year;
+			if (info[i].month != null) { text += ("/" + info[i].month); }
+			if (info[i].day != null) { text += ("/" + info[i].day); }
+			$("<td width='1%'>" + text + "</div></td>").appendTo(str);
+		}
         // コメント
         $("<td width='10%'>" + info[i].comment + "</div></td>").appendTo(str);
 
