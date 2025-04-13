@@ -38,6 +38,29 @@
 </table>
 </div>
 
+<!-- 仮 ソート矢印 -->
+<style>
+    /* ソート可能なカラムの見た目 */
+    td[sortable] {
+        position: relative;
+        cursor: pointer;
+        padding-right: 15px;
+    }
+    td[sortable]:after {
+        content: '↕'; /* 初期矢印 */
+        position: absolute;
+        right: 5px;
+        color: gray;
+    }
+    td[sortable].sort-asc:after {
+        content: '▲'; /* 昇順矢印 */
+        color: blue;
+    }
+    td[sortable].sort-desc:after {
+        content: '▼'; /* 降順矢印 */
+        color: red;
+    }
+</style>
 <script language="javascript" type="text/javascript">
 
 // メニュー開閉
@@ -70,6 +93,7 @@ $(document).ready(function(){
 	});
 });
 
+
 function makeBMSTable(info, mark, order) {
     if(typeof order === 'undefined') order = null;
 
@@ -77,42 +101,45 @@ function makeBMSTable(info, mark, order) {
     obj.html("");
 
     // 表示/非表示切り替えボタン
-    let toggleButton = $("<button id='toggleRows' style='margin-bottom:10px;'>難易度区切り行 を非表示</button>");
+    let toggleButton = $("<button id='toggleRows' style='margin-bottom:10px;'>区切り行を非表示にする</button>");
     toggleButton.on("click", function() {
         let isHidden = $(".tr_separate").is(":hidden");
         $(".tr_separate").toggle();
-        $(this).text(isHidden ? "難易度区切り行 を非表示" : "難易度区切り行 を表示");
+        $(this).text(isHidden ? "区切り行を非表示にする" : "区切り行を表示する");
     });
     obj.before(toggleButton);
 
     let headerRow = $("<tr height='20' style='color:white;background-color:#666666'></tr>");
     let headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "差分", "BPM", "total", "追加日時", "コメント"];
-    let sortableIndexes = ["LV", "タイトル(IRリンク)", "作者(敬称略)<br/>(本体リンク)", "BPM", "total", "追加日時", "コメント"];
+    let sortableIndexes = ["LV", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "BPM", "total", "追加日時", "コメント"];
     let sortState = {};
 
-	// ソート用カラム構築
     headers.forEach((text, index) => {
         let headerCell = $("<td align='center'>" + text + "</td>");
         
+        // ソート可能なカラム構築
         if (sortableIndexes.includes(text)) {
             headerCell.attr("sortable", true);
-            headerCell.css("cursor", "pointer");
             headerCell.on("click", function() {
                 sortState[index] = !sortState[index]; // ソート方向を切り替え
                 let rows = obj.find("tr:gt(0)").toArray().sort(comparer(index, text, sortState[index]));
                 if (!sortState[index]) { rows.reverse(); }
 
-                // 区切り行を自動で非表示にする
+                // ソート中は区切り行を非表示にし、ボタンを「元の状態に戻す」に変更
                 $(".tr_separate").hide();
-                $("#toggleRows").text("区切り行を表示する");
-
-                headerRow.find("td").each((i, td) => {
-                    if (sortableIndexes.includes(headers[i])) {
-                        $(td).text(headers[i]); // ソートアイコンのリセット
-                    }
+                toggleButton.text("元の状態に戻す").off("click").on("click", function() {
+                    $(".tr_separate").show();
+                    $(this).text("区切り行を非表示にする").off("click").on("click", function() {
+                        let isHidden = $(".tr_separate").is(":hidden");
+                        $(".tr_separate").toggle();
+                        $(this).text(isHidden ? "区切り行を非表示にする" : "区切り行を表示する");
+                    });
                 });
 
-                headerCell.text(text + (sortState[index] ? " ▲" : " ▼")); // ソート方向表示
+                // CSSで矢印を追加
+                headerRow.find("td").removeClass("sort-asc sort-desc");
+                headerCell.addClass(sortState[index] ? "sort-asc" : "sort-desc");
+
                 obj.append(rows);
             });
         }
@@ -163,7 +190,7 @@ function makeBMSTable(info, mark, order) {
         $("<td width='1%' align='center'><a href='https://bms-score-viewer.pages.dev/view?md5=" + info[i].md5 + "' target='_blank'>■</a></td>").appendTo(str);
         $("<td width='13%'><a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + info[i].md5 + "' target='_blank'>" + info[i].title + "</a></td>").appendTo(str);
         $("<td width='5%'>" + (info[i].artist ? "<a href='" + info[i].url + "' target='_blank'>" + info[i].artist + "</a>" : "") + "</td>").appendTo(str);
-        $("<td width='1%'>DL</td>").appendTo(str); // 差分はソート対象外なので変更なし
+        $("<td width='1%'>DL</td>").appendTo(str);
         $("<td width='1%'>" + info[i].bpm + "</td>").appendTo(str);
         $("<td width='1%'>" + info[i].total + "</td>").appendTo(str);
         $("<td width='1%'>" + (info[i].year ? (info[i].year + "/" + (info[i].month || "") + "/" + (info[i].day || "")) : "('ω')｡o(?)") + "</td>").appendTo(str);
@@ -177,6 +204,15 @@ function makeBMSTable(info, mark, order) {
         obj_sep.html("<td colspan='11' align='center'><b>" + mark + x + " (" + count + "譜面)</b></td>");
     }
 }
+</script>
+
+
+変更点:
+- CSSでソート可能なカラムに上下矢印を常に表示。ソート方向に応じて矢印と色を動的に変更。
+- ソート中は「元の状態に戻す」ボタンを表示し、クリックで元の表示に復帰。
+
+ぜひ試してみてください！ 😄✨
+
 
 // 過去の手書きコード
 /*
