@@ -132,20 +132,20 @@ $(document).ready(function() {
 
 		function comparer(index, columnName) {
 		    return function(a, b) {
-		        let valA = $(a).children("td").eq(index).text();
-		        let valB = $(b).children("td").eq(index).text();
+		        let valA = $(a).children("td").eq(index).html(); // 現在のHTMLを取得
+		        let valB = $(b).children("td").eq(index).html();
 			
-		        // 追加日時のみの処理
+		        // 追加日時カラム専用の処理
 		        if (columnName === "追加日時") {
-		            // "('ω')｡o(?)" を常に一番下に配置する
-		            if (valA === "('ω')｡o(?)" && valB === "('ω')｡o(?)") {
+		            // "('ω')｡o(?)" を常に最下部に配置する
+		            if (valA.includes("('ω')｡o(?)") && valB.includes("('ω')｡o(?)")) {
 		                return 0; // 両方が "('ω')｡o(?)" の場合、位置変更なし
 		            }
-		            if (valA === "('ω')｡o(?)") {
-		                return sortState[sortableIndexes[columnName]] ? -1 : 1; // 昇順なら-1、降順なら1
+		            if (valA.includes("('ω')｡o(?)")) {
+		                return sortState[headers[columnName]] ? 1 : -1; // 昇順なら1、降順なら-1
 		            }
-		            if (valB === "('ω')｡o(?)") {
-		                return sortState[sortableIndexes[columnName]] ? 1 : -1; // 昇順なら1、降順なら-1
+		            if (valB.includes("('ω')｡o(?)")) {
+		                return sortState[headers[columnName]] ? -1 : 1; // 昇順なら-1、降順なら1
 		            }
 				
 		            // "/" 区切りの日付を比較
@@ -155,7 +155,7 @@ $(document).ready(function() {
 				
 		            for (let i = 0; i < minLen; i++) {
 		                if (aDateParts[i] !== bDateParts[i]) {
-		                    return sortState[sortableIndexes[columnName]]
+		                    return sortState[headers[columnName]]
 		                        ? aDateParts[i] - bDateParts[i] // 昇順（通常の降順に逆転させる）
 		                        : bDateParts[i] - aDateParts[i]; // 降順（通常の昇順に逆転させる）
 		                }
@@ -163,7 +163,7 @@ $(document).ready(function() {
 		            return 0;
 		        }
 			
-		        // 他のカラムの処理
+		        // 他のカラム処理
 		        if (columnName === "total") {
 		            // "/" 区切りの最初の値で比較
 		            let valAParts = valA.split("/").map(num => parseFloat(num) || 0);
@@ -202,7 +202,7 @@ $(document).ready(function() {
             $("<td width='1%'>DL</td>").appendTo(str);
             $("<td width='1%'>" + info[i].bpm + "</td>").appendTo(str);
             $("<td width='1%'>" + info[i].total + "/" + info[i].totalnote + "</td>").appendTo(str);
-            $("<td width='1%'>" + (info[i].year ? (info[i].year + "/" + (info[i].month || 0) + "/" + (info[i].day || 0)) : "('ω')｡o(?)") + "</td>").appendTo(str);
+            $("<td width='1%'>" + (info[i].year ? (info[i].year + "/" + (info[i].month || 0) + "/" + (info[i].day || 0)) : "<font color='#7d7d7d'>('ω')｡o(?)</font>") + "</td>").appendTo(str);
             $("<td width='10%'>" + info[i].comment + "</td>").appendTo(str);
 
             str.appendTo(obj);
