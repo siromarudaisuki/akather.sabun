@@ -67,7 +67,6 @@ $(document).ready(function() {
     });
 
     let initialInfo;
-
     $.getJSON(bmstableContent, function(header){
         $.getJSON(header.data_url, function(information){
             initialInfo = JSON.parse(JSON.stringify(information)); // 深いコピーで保存
@@ -85,12 +84,14 @@ $(document).ready(function() {
         if(initialInfo) {
             $.getJSON(bmstableContent, function(header){
                 if(header["level"]) {
-                    makeBMSTable(initialInfo, header.symbol, header["level"]); // 初期データで再生成
+                    makeBMSTable(initialInfo, header.symbol, header["level"]);
                 } else {
-                    makeBMSTable(initialInfo, header.symbol); // 初期データで再生成
+                    makeBMSTable(initialInfo, header.symbol);
                 }
-                toggleButton.show(); // 区切り非表示ボタンを再表示
-                resetButton.hide(); // 元の状態に戻すボタンを非表示
+
+				// 初期ボタン表示
+                toggleButton.show();
+                resetButton.hide();
             });
         }
     });
@@ -139,21 +140,14 @@ $(document).ready(function() {
 		        // 追加日時カラム専用の処理
 		        if (columnName === "追加日時") {
 		            // "('ω')｡o(?)" を常に最下部に配置する
-            		if (valA === "('ω')｡o(?)" && valB === "('ω')｡o(?)") {
-            		    return 0; // 両方が "('ω')｡o(?)" の場合、位置変更なし
-            		}
-            		if (valA === "('ω')｡o(?)") {
-            		    return sortState[index] ? 1 : -1; // 昇順なら1、降順なら-1
-            		}
-            		if (valB === "('ω')｡o(?)") {
-            		    return sortState[index] ? -1 : 1; // 昇順なら-1、降順なら1
-            		}
+            		if (valA === "('ω')｡o(?)" && valB === "('ω')｡o(?)") { return 0; } // 両方が "('ω')｡o(?)" の場合、位置変更なし
+            		if (valA === "('ω')｡o(?)") { return sortState[index] ? 1 : -1; } // 昇順なら1、降順なら-1
+            		if (valB === "('ω')｡o(?)") { return sortState[index] ? -1 : 1; } // 昇順なら-1、降順なら1
 				
 		            // "/" 区切りの日付を比較
 		            let aDateParts = valA.split("/").map(num => parseInt(num) || 0);
 		            let bDateParts = valB.split("/").map(num => parseInt(num) || 0);
 		            let minLen = Math.min(aDateParts.length, bDateParts.length);
-				
 		            for (let i = 0; i < minLen; i++) {
 		                if (aDateParts[i] !== bDateParts[i]) {
 		                    return sortState[headers[columnName]]
@@ -163,12 +157,15 @@ $(document).ready(function() {
 		            }
 		            return 0;
 		        }
-			
 		        // 他のカラム処理
-		        if (columnName === "total") {
+		        else if (columnName === "total") {
 		            // "/" 区切りの最初の値で比較
 		            let valAParts = valA.split("/").map(num => parseFloat(num) || 0);
 		            let valBParts = valB.split("/").map(num => parseFloat(num) || 0);
+					// "?" を常に最下部に配置する
+            		if (valAParts[0] === valBParts[0]) { return 0; }
+            		if (valAParts[0] === "?") { return sortState[index] ? 1 : -1; } // 昇順なら1、降順なら-1
+            		if (valBParts[0] === "?") { return sortState[index] ? -1 : 1; } // 昇順なら-1、降順なら1}
 		            return valAParts[0] - valBParts[0];
 		        } else if ($.isNumeric(valA) && $.isNumeric(valB)) {
 		            return valA - valB;
