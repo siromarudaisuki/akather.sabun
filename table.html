@@ -132,8 +132,8 @@ $(document).ready(function() {
 
 		function comparer(index, columnName) {
 		    return function(a, b) {
-		        let valA = $(a).children("td").eq(index).html() || ""; // 現在のHTMLを取得
-		        let valB = $(b).children("td").eq(index).html() || "";
+		        let valA = $(a).children("td").eq(index).html()?.replace(/<\/?[^>]+(>|$)/g, "") || ""; // Remove HTML tags manually
+		        let valB = $(b).children("td").eq(index).html()?.replace(/<\/?[^>]+(>|$)/g, "") || ""; // Remove HTML tags manually
 				console.log("[" + columnName + "] index:" + index + ", a:" + valA + ", b:" + valB);
 				
 		        // 追加日時カラム専用の処理
