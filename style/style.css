@@ -115,20 +115,22 @@ td[sortable].sort-desc:after {
 }
 
 /* ボタン用 */
-#toggleRows {
-    font-size: 16px;
-    font-weight: bold;
-    padding: 10px 20px;
-    color: #ffffff;
-    background: linear-gradient(90deg, #4CAF50, #81C784);
-    border: 2px solid #388E3C;
-    border-radius: 8px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
+.table-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
 }
-#toggleRows:hover {
-    background: linear-gradient(90deg, #81C784, #4CAF50);
-    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3);
-    transform: scale(1.05);
+button {
+  font-size: 14px;
+  padding: 5px 10px;
+  color: #ffffff;
+  background: linear-gradient(90deg, #4CAF50, #81C784);
+  border: 1px solid #388E3C;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+button:hover {
+  background: linear-gradient(90deg, #81C784, #4CAF50);
+  transform: scale(1.03);
 }
