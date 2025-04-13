@@ -80,12 +80,11 @@ function makeBMSTable(info, mark, order) {
     obj.html("");
 
     // 初期データを保存
-    const initialInfo = JSON.parse(JSON.stringify(info)); // 深いコピーでデータを保存
+    const initialInfo = JSON.parse(JSON.stringify(info));
 
     // ボタンを追加（表の外に配置）
     const buttonContainer = $("<div class='table-buttons'></div>");
     let toggleButton = $("<button id='toggleRows'>区切り行を非表示にする</button>");
-    let resetButton = $("<button id='resetTable'>元の状態に戻す</button>");
 
     toggleButton.on("click", function() {
         let isHidden = $(".tr_separate").is(":hidden");
@@ -93,45 +92,28 @@ function makeBMSTable(info, mark, order) {
         $(this).text(isHidden ? "区切り行を非表示にする" : "区切り行を表示する");
     });
 
-    resetButton.on("click", function() {
-        // テーブルを初期状態に完全リセット
-        obj.html("");
-        makeBMSTable(initialInfo, mark, order);
-    });
-
-    buttonContainer.append(toggleButton).append(resetButton);
+    buttonContainer.append(toggleButton);
     obj.before(buttonContainer);
 
-    // ヘッダー作成
     let headerRow = $("<tr height='20' style='color:white;background-color:#666666'></tr>");
-    let headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略)(本体リンク)", "差分", "BPM", "total", "追加日時", "コメント"];
-    let sortableIndexes = ["LV", "タイトル(IRリンク)", "作者(敬称略)(本体リンク)", "BPM", "total", "追加日時", "コメント"];
+    let headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "差分", "BPM", "total", "追加日時", "コメント"];
+    let sortableIndexes = ["LV", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "BPM", "total", "追加日時", "コメント"];
     let sortState = {};
 
     headers.forEach((text, index) => {
         let headerCell = $("<td align='center'>" + text + "</td>");
         
-        // ソート可能なカラムにソート機能を追加
         if (sortableIndexes.includes(text)) {
             headerCell.attr("sortable", true);
             headerCell.css("cursor", "pointer");
             headerCell.on("click", function() {
-                sortState[index] = !sortState[index]; // ソート方向を切り替え
+                sortState[index] = !sortState[index];
                 let rows = obj.find("tr:gt(0)").toArray().sort(comparer(index, text, sortState[index]));
                 if (!sortState[index]) { rows.reverse(); }
 
-                // ソート中は区切り行を非表示にし、表示ボタンを切り替え
                 $(".tr_separate").hide();
-                toggleButton.text("元の状態に戻す").off("click").on("click", function() {
-                    $(".tr_separate").show();
-                    $(this).text("区切り行を非表示にする").off("click").on("click", function() {
-                        let isHidden = $(".tr_separate").is(":hidden");
-                        $(".tr_separate").toggle();
-                        $(this).text(isHidden ? "区切り行を非表示にする" : "区切り行を表示する");
-                    });
-                });
+                toggleButton.text("区切り行を表示する");
 
-                // CSSで矢印を追加
                 headerRow.find("td").removeClass("sort-asc sort-desc");
                 headerCell.addClass(sortState[index] ? "sort-asc" : "sort-desc");
 
@@ -150,6 +132,8 @@ function makeBMSTable(info, mark, order) {
             let valB = $(b).children("td").eq(index).text();
 
             if (columnName === "total") {
+                if (valA === "('ω')｡o(?)") return 1; // 一番下にする
+                if (valB === "('ω')｡o(?)") return -1;
                 return parseFloat(valA) - parseFloat(valB);
             }
             else if (columnName === "追加日時") {
@@ -187,7 +171,7 @@ function makeBMSTable(info, mark, order) {
         $("<td width='5%'>" + (info[i].artist ? "<a href='" + info[i].url + "' target='_blank'>" + info[i].artist + "</a>" : "") + "</td>").appendTo(str);
         $("<td width='1%'>DL</td>").appendTo(str);
         $("<td width='1%'>" + info[i].bpm + "</td>").appendTo(str);
-        $("<td width='1%'>" + info[i].total + "</td>").appendTo(str);
+        $("<td width='1%'>" + info[i].total + "/" + info[i].totalnote + "</td>").appendTo(str);
         $("<td width='1%'>" + (info[i].year ? (info[i].year + "/" + (info[i].month || "") + "/" + (info[i].day || "")) : "('ω')｡o(?)") + "</td>").appendTo(str);
         $("<td width='10%'>" + info[i].comment + "</td>").appendTo(str);
 
