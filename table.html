@@ -305,11 +305,11 @@ function makeBMSTable(info, mark, order) {
 		// トータル
 		$("<td width='1%'>" + info[i].total + "/" + info[i].totalnote + "</div></td>").appendTo(str);
 		// 日付
-		if (info[i].year != null)
+		if (info[i].year)
 		{
 			let text = info[i].year;
-			if (info[i].month != null) { text += ("/" + info[i].month); }
-			if (info[i].day != null) { text += ("/" + info[i].day); }
+			if (info[i].month) { text += ("/" + info[i].month); }
+			if (info[i].day) { text += ("/" + info[i].day); }
 			$("<td width='1%'>" + text + "</div></td>").appendTo(str);
 		}
         // コメント
