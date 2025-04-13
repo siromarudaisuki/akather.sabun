@@ -40,136 +40,130 @@
 
 
 <script language="javascript" type="text/javascript">
+// メニュー開閉
+function toggleMenu(tName) {
+    const tMenu = document.getElementById(tName).style;
+    tMenu.display = (tMenu.display === 'none') ? "block" : "none";
+}
 
-	// メニュー開閉
-	function toggleMenu(tName) {
-		const tMenu = document.getElementById(tName).style;
-		tMenu.display = (tMenu.display === 'none') ? "block" : "none";
-	}
-	
-	$(document).ready(function () {
-		const bmstableContent = $("meta[name=bmstable]").attr("content"); // Initial data retrieval
-		let initialData; // Variable to store initial data
-	
-		// Button generation
-		const buttonContainer = $("<div class='table-buttons'></div>").insertBefore("#table_int");
-		const toggleButton = $("<button id='toggleRows'>区切り行を非表示にする</button>").appendTo(buttonContainer).on("click", toggleRowsVisibility);
-		const resetButton = $("<button id='resetTable'>元の状態に戻す</button>").appendTo(buttonContainer).on("click", resetTable);
-	
-		// Fetch JSON data
-		$.getJSON(bmstableContent)
-			.done(function (header) {
-				$.getJSON(header.data_url)
-					.done(function (data) {
-						initialData = JSON.parse(JSON.stringify(data)); // Deep copy of the initial data
-						generateTable(data, header.symbol, header.level);
-					})
-					.fail(function () {
-						alert("データの取得に失敗しました。");
-					});
-			})
-			.fail(function () {
-				alert("ヘッダー情報の取得に失敗しました。");
-			});
-	
-		// Sort button behavior handler
-		function handleSortButtonDisplay(sortApplied) {
-			if (sortApplied) {
-				resetButton.show();
-				toggleButton.hide();
-			} else {
-				resetButton.hide();
-				toggleButton.show();
-			}
-		}
-	});
-	
-	// Generate BMS Table
-	function generateTable(data, symbol, level = null) {
-		const table = $("#table_int");
-		table.html(""); // Clear table
-	
-		const headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "差分", "BPM", "total", "追加日時", "コメント"];
-		const sortableColumns = ["LV", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "BPM", "total", "追加日時", "コメント"];
-		const sortState = {};
-	
-		// Create header row
-		const headerRow = $("<tr height='20' style='color:white;background-color:#666666'></tr>");
-		headers.forEach((headerText, index) => {
-			const cell = $("<td align='center'>" + headerText + "</td>");
-			if (sortableColumns.includes(headerText)) {
-				cell.addClass("sortable-column").on("click", () => sortTable(table, index, headerText, sortState));
-			}
-			headerRow.append(cell);
-		});
-		table.append(headerRow);
-	
-		// Generate data rows
-		let currentLevel = "";
-		let count = 0;
-		let separatorRow = null;
-		data.forEach(row => {
-			if (currentLevel !== row.level) {
-				if (separatorRow) {
-					separatorRow.html(`<td colspan='11' align='center'><b>${symbol} ${currentLevel} (${count}譜面)</b></td>`);
-				}
-				currentLevel = row.level;
-				separatorRow = $(`<tr class='tr_separate' id='${symbol}${currentLevel}'></tr>`).appendTo(table);
-				count = 0;
-			}
-	
-			const rowElement = $("<tr></tr>");
-			Object.values(row).forEach(cellValue => {
-				rowElement.append(`<td>${cellValue}</td>`);
-			});
-			table.append(rowElement);
-			count++;
-		});
-	
-		if (separatorRow) {
-			separatorRow.html(`<td colspan='11' align='center'><b>${symbol} ${currentLevel} (${count}譜面)</b></td>`);
-		}
-	}
-	
-	// Sort function
-	function sortTable(table, columnIndex, columnName, sortState) {
-		const rows = table.find("tr:gt(0)").toArray(); // Data rows
-		const separatorRows = $(".tr_separate"); // Separator rows
-	
-		separatorRows.hide(); // Hide separator rows
-	
-		rows.sort((rowA, rowB) => {
-			const valA = $(rowA).children("td").eq(columnIndex).text();
-			const valB = $(rowB).children("td").eq(columnIndex).text();
-	
-			if (columnName === "追加日時") {
-				const aDateParts = valA.split("/").map(num => parseInt(num) || 0);
-				const bDateParts = valB.split("/").map(num => parseInt(num) || 0);
-	
-				for (let i = 0; i < Math.min(aDateParts.length, bDateParts.length); i++) {
-					if (aDateParts[i] !== bDateParts[i]) {
-						return sortState[columnIndex] ? bDateParts[i] - aDateParts[i] : aDateParts[i] - bDateParts[i];
-					}
-				}
-				return 0;
-			}
-	
-			if ($.isNumeric(valA) && $.isNumeric(valB)) {
-				return sortState[columnIndex] ? valB - valA : valA - valB;
-			}
-	
-			return sortState[columnIndex] ? valB.localeCompare(valA) : valA.localeCompare(valB);
-		});
-	
-		table.append(rows);
-	
-		const headerCells = table.find("tr:first-child td.sortable-column");
-		headerCells.removeClass("sort-asc sort-desc");
-		const targetHeaderCell = headerCells.eq(columnIndex);
-		targetHeaderCell.addClass(sortState[columnIndex] ? "sort-asc" : "sort-desc");
-	
-		sortState[columnIndex] = !sortState[columnIndex]; // Toggle state
-	}
+// JSONデータを取得してテーブル生成
+$(document).ready(function() {
+    const bmstableContent = $("meta[name=bmstable]").attr("content"); // 最初に読み込んだ値を保持
+    let initialData; // 初期データの保存
+
+    // ボタンコンテナ生成
+    const buttonContainer = $("<div class='table-buttons'></div>").insertBefore("#table_int");
+    $("<button id='toggleRows'>区切り行を非表示にする</button>").appendTo(buttonContainer)
+        .on("click", toggleRowsVisibility);
+
+    $("<button id='resetTable'>元の状態に戻す</button>").appendTo(buttonContainer)
+        .on("click", resetTable);
+
+    // JSONデータの取得とテーブル生成
+    $.getJSON(bmstableContent)
+        .done(function(header) {
+            $.getJSON(header.data_url)
+                .done(function(data) {
+                    initialData = JSON.parse(JSON.stringify(data)); // 深いコピーで保存
+                    generateTable(data, header.symbol, header.level);
+                })
+                .fail(function() {
+                    alert("データの取得に失敗しました。");
+                });
+        })
+        .fail(function() {
+            alert("ヘッダー情報の取得に失敗しました。");
+        });
+});
+
+// 区切り行の非表示/表示
+function toggleRowsVisibility() {
+    const isHidden = $(".tr_separate").is(":hidden");
+    $(".tr_separate").toggle();
+    $(this).text(isHidden ? "区切り行を非表示にする" : "区切り行を表示する");
+}
+
+// テーブルのリセット
+function resetTable() {
+    if (initialData) {
+        $("#table_int").html(""); // テーブルクリア
+        generateTable(initialData);
+    } else {
+        alert("初期データが見つかりません。");
+    }
+}
+
+// 汎用テーブル生成関数
+function generateTable(data, symbol, level = null) {
+    const table = $("#table_int");
+    table.html(""); // テーブル内容をクリア
+
+    const headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "差分", "BPM", "total", "追加日時", "コメント"];
+    const sortableColumns = ["LV", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "BPM", "total", "追加日時", "コメント"];
+    let sortState = {}; // ソート状態を保持
+
+    // ヘッダー行作成
+    const headerRow = $("<tr height='20' style='color:white;background-color:#666666'></tr>");
+    headers.forEach((headerText, index) => {
+        const cell = $("<td align='center'>" + headerText + "</td>");
+        if (sortableColumns.includes(headerText)) {
+            cell.css("cursor", "pointer").on("click", () => sortTable(table, index, headerText, sortState));
+        }
+        headerRow.append(cell);
+    });
+    table.append(headerRow);
+
+    // データ行作成
+    let currentLevel = "";
+    let count = 0;
+    let separatorRow = null;
+    data.forEach(row => {
+        if (currentLevel !== row.level) {
+            if (separatorRow) {
+                separatorRow.html(`<td colspan='11' align='center'><b>${symbol} ${currentLevel} (${count}譜面)</b></td>`);
+            }
+            currentLevel = row.level;
+            separatorRow = $(`<tr class='tr_separate' id='${symbol}${currentLevel}'></tr>`).appendTo(table);
+            count = 0;
+        }
+
+        const dataRow = $("<tr class='tr_normal'></tr>");
+        if (row.state) dataRow.addClass(`state${row.state}`);
+        dataRow.append(`<td width='1%'>${symbol} ${currentLevel}</td>`);
+        dataRow.append(`<td width='1%' align='center'>${row.youtube ? `<a href='${row.youtube}' target='_blank'><img src='style/youtube.gif' border='0' alt='Youtube' /></a>` : ""}</td>`);
+        dataRow.append(`<td width='1%' align='center'><a href='https://bms-score-viewer.pages.dev/view?md5=${row.md5}' target='_blank'>■</a></td>`);
+        dataRow.append(`<td width='13%'><a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=${row.md5}' target='_blank'>${row.title}</a></td>`);
+        dataRow.append(`<td width='5%'>${row.artist ? `<a href='${row.url}' target='_blank'>${row.artist}</a>` : ""}</td>`);
+        dataRow.append(`<td width='1%'>DL</td>`);
+        dataRow.append(`<td width='1%'>${row.bpm}</td>`);
+        dataRow.append(`<td width='1%'>${row.total}/${row.totalnote}</td>`);
+        dataRow.append(`<td width='1%'>${row.year ? `${row.year}/${row.month || 0}/${row.day || 0}` : "('ω')｡o(?)"}</td>`);
+        dataRow.append(`<td width='10%'>${row.comment}</td>`);
+        table.append(dataRow);
+        count++;
+    });
+
+    // 最後の区切り行
+    if (separatorRow) {
+        separatorRow.html(`<td colspan='11' align='center'><b>${symbol} ${currentLevel} (${count}譜面)</b></td>`);
+    }
+}
+
+// ソート機能
+function sortTable(table, columnIndex, columnName, sortState) {
+    const rows = table.find("tr:gt(0)").toArray().sort((rowA, rowB) => {
+        const valA = $(rowA).children("td").eq(columnIndex).text();
+        const valB = $(rowB).children("td").eq(columnIndex).text();
+        if ($.isNumeric(valA) && $.isNumeric(valB)) {
+            return valA - valB;
+        } else {
+            return valA.localeCompare(valB);
+        }
+    });
+    if (!sortState[columnIndex]) rows.reverse();
+    table.append(rows);
+    sortState[columnIndex] = !sortState[columnIndex];
+}
 </script>
 </body>
 </html>
