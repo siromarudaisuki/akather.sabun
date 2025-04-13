@@ -90,3 +90,45 @@ body.diff {
 .tableflame tr.tr_normal:hover {
   background-color: #70f0f0;
 }
+
+
+/* ソート可能なカラム */
+td[sortable] {
+    position: relative;
+    cursor: pointer;
+    text-decoration: underline;
+    padding-right: 15px;
+}
+td[sortable]:after {
+    content: '↕'; /* 初期矢印 */
+    position: absolute;
+    right: 5px;
+    color: gray;
+}
+td[sortable].sort-asc:after {
+    content: '▲'; /* 昇順矢印 */
+    color: blue;
+}
+td[sortable].sort-desc:after {
+    content: '▼'; /* 降順矢印 */
+    color: red;
+}
+
+/* ボタン用 */
+#toggleRows {
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 20px;
+    color: #ffffff;
+    background: linear-gradient(90deg, #4CAF50, #81C784);
+    border: 2px solid #388E3C;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+#toggleRows:hover {
+    background: linear-gradient(90deg, #81C784, #4CAF50);
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+}

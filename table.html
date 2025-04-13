@@ -38,29 +38,7 @@
 </table>
 </div>
 
-<!-- 仮 ソート矢印 -->
-<style>
-    /* ソート可能なカラムの見た目 */
-    td[sortable] {
-        position: relative;
-        cursor: pointer;
-        padding-right: 15px;
-    }
-    td[sortable]:after {
-        content: '↕'; /* 初期矢印 */
-        position: absolute;
-        right: 5px;
-        color: gray;
-    }
-    td[sortable].sort-asc:after {
-        content: '▲'; /* 昇順矢印 */
-        color: blue;
-    }
-    td[sortable].sort-desc:after {
-        content: '▼'; /* 降順矢印 */
-        color: red;
-    }
-</style>
+
 <script language="javascript" type="text/javascript">
 
 // メニュー開閉
@@ -94,11 +72,15 @@ $(document).ready(function(){
 });
 
 
+// BMSテーブル構築
 function makeBMSTable(info, mark, order) {
-    if(typeof order === 'undefined') order = null;
+    if (typeof order === 'undefined') order = null;
 
     let obj = $("#table_int");
     obj.html("");
+
+    // 元に戻す用
+    const initialInfo = JSON.parse(JSON.stringify(info));
 
     // 表示/非表示切り替えボタン
     let toggleButton = $("<button id='toggleRows' style='margin-bottom:10px;'>区切り行を非表示にする</button>");
@@ -109,23 +91,49 @@ function makeBMSTable(info, mark, order) {
     });
     obj.before(toggleButton);
 
+    // 元の状態に戻すボタン
+    let resetButton = $("<button id='resetTable' style='margin-bottom:10px; margin-left:10px;'>元の状態に戻す</button>");
+    resetButton.on("click", function() {
+        makeBMSTable(initialInfo, mark, order); // 初期データを使って再生成
+    });
+    obj.before(resetButton);
+
     let headerRow = $("<tr height='20' style='color:white;background-color:#666666'></tr>");
     let headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "差分", "BPM", "total", "追加日時", "コメント"];
     let sortableIndexes = ["LV", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "BPM", "total", "追加日時", "コメント"];
     let sortState = {};
 
+	function comparer(index, columnName, ascending) {
+        return function(a, b) {
+            let valA = $(a).children("td").eq(index).text();
+            let valB = $(b).children("td").eq(index).text();
+
+            if (columnName === "total") {
+                return parseFloat(valA) - parseFloat(valB);
+            }
+            else if (columnName === "追加日時") {
+                return new Date(valA) - new Date(valB);
+            }
+            else if ($.isNumeric(valA) && $.isNumeric(valB)) {
+                return valA - valB;
+            } else {
+                return valA.localeCompare(valB);
+            }
+        };
+    }
     headers.forEach((text, index) => {
         let headerCell = $("<td align='center'>" + text + "</td>");
         
-        // ソート可能なカラム構築
+        // ソート可能なカラムにソート機能を追加
         if (sortableIndexes.includes(text)) {
             headerCell.attr("sortable", true);
+            headerCell.css("cursor", "pointer");
             headerCell.on("click", function() {
                 sortState[index] = !sortState[index]; // ソート方向を切り替え
                 let rows = obj.find("tr:gt(0)").toArray().sort(comparer(index, text, sortState[index]));
                 if (!sortState[index]) { rows.reverse(); }
 
-                // ソート中は区切り行を非表示にし、ボタンを「元の状態に戻す」に変更
+                // ソート中は区切り行を非表示にし、ボタンを切り替え
                 $(".tr_separate").hide();
                 toggleButton.text("元の状態に戻す").off("click").on("click", function() {
                     $(".tr_separate").show();
@@ -146,31 +154,11 @@ function makeBMSTable(info, mark, order) {
 
         headerRow.append(headerCell);
     });
-
     headerRow.appendTo(obj);
 
-    function comparer(index, columnName, ascending) {
-        return function(a, b) {
-            let valA = $(a).children("td").eq(index).text();
-            let valB = $(b).children("td").eq(index).text();
-
-            if (columnName === "total") {
-                return parseFloat(valA) - parseFloat(valB);
-            }
-            else if (columnName === "追加日時") {
-                return new Date(valA) - new Date(valB);
-            }
-            else if ($.isNumeric(valA) && $.isNumeric(valB)) {
-                return valA - valB;
-            } else {
-                return valA.localeCompare(valB);
-            }
-        };
-    }
 
     let obj_sep = null;
     let x = "", count = 0;
-
     for (let i = 0; i < info.length; i++) {
         if (x != info[i].level) {
             if (obj_sep != null) {
@@ -204,14 +192,6 @@ function makeBMSTable(info, mark, order) {
         obj_sep.html("<td colspan='11' align='center'><b>" + mark + x + " (" + count + "譜面)</b></td>");
     }
 }
-</script>
-
-
-変更点:
-- CSSでソート可能なカラムに上下矢印を常に表示。ソート方向に応じて矢印と色を動的に変更。
-- ソート中は「元の状態に戻す」ボタンを表示し、クリックで元の表示に復帰。
-
-ぜひ試してみてください！ 😄✨
 
 
 // 過去の手書きコード
