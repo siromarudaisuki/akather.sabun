@@ -164,8 +164,8 @@ $(document).ready(function() {
 		            let valBParts = valB.split("/").map(num => parseFloat(num) || 0);
 					// "?" を常に最下部に配置する
             		if (valAParts[0] === valBParts[0]) { return 0; }
-            		if (valAParts[0] === "?") { return sortState[index] ? 1 : -1; } // 昇順なら1、降順なら-1
-            		if (valBParts[0] === "?") { return sortState[index] ? -1 : 1; } // 昇順なら-1、降順なら1}
+            		if (!$.isNumeric(valAParts[0])) { return sortState[index] ? 1 : -1; } // 昇順なら1、降順なら-1
+            		if (!$.isNumeric(valBParts[0])) { return sortState[index] ? -1 : 1; } // 昇順なら-1、降順なら1}
 		            return valAParts[0] - valBParts[0];
 		        } else if ($.isNumeric(valA) && $.isNumeric(valB)) {
 		            return valA - valB;
