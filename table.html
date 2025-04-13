@@ -138,13 +138,13 @@ $(document).ready(function() {
 		        // 追加日時カラム専用の処理
 		        if (columnName === "追加日時") {
 		            // "('ω')｡o(?)" を常に最下部に配置する
-            		if (valA.indexOf("('ω')｡o(?)") !== -1 && valB.indexOf("('ω')｡o(?)") !== -1) {
+            		if (valA === "('ω')｡o(?)" && valB === "('ω')｡o(?)") {
             		    return 0; // 両方が "('ω')｡o(?)" の場合、位置変更なし
             		}
-            		if (valA.indexOf("('ω')｡o(?)") !== -1) {
+            		if (valA === "('ω')｡o(?)") {
             		    return sortState[headers[columnName]] ? 1 : -1; // 昇順なら1、降順なら-1
             		}
-            		if (valB.indexOf("('ω')｡o(?)") !== -1) {
+            		if (valB === "('ω')｡o(?)") {
             		    return sortState[headers[columnName]] ? -1 : 1; // 昇順なら-1、降順なら1
             		}
 				
