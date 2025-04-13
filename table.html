@@ -56,8 +56,8 @@ function menu(tName){
 
 // 'GASを使ってスプレッドシートからjsonに変換した差分情報'を取得
 $(document).ready(function(){
-    // ボタンをページの上部に追加
-    let buttonContainer = $("<div class='table-buttons'></div>").appendTo("body");  
+    // ボタンのコンテナをテーブルの上に中央配置
+    let buttonContainer = $("<div class='table-buttons'></div>").insertBefore("#table_int");  
     let toggleButton = $("<button id='toggleRows'>区切り行を非表示にする</button>").appendTo(buttonContainer);
     let resetButton = $("<button id='resetTable'>元の状態に戻す</button>").appendTo(buttonContainer);
 
@@ -67,7 +67,7 @@ $(document).ready(function(){
         $(this).text(isHidden ? "区切り行を非表示にする" : "区切り行を表示する");
     });
 
-    // 初期データを保存しておく
+    // 初期データを保存
     let initialInfo;
     $.getJSON($("meta[name=bmstable]").attr("content"), function(header){
         $.getJSON(header.data_url, function(information){
@@ -88,7 +88,6 @@ $(document).ready(function(){
         }
     });
 });
-
 
 // BMSテーブル構築
 function makeBMSTable(info, mark, order) {
@@ -166,7 +165,7 @@ function makeBMSTable(info, mark, order) {
         let str = $("<tr class='tr_normal'></tr>");
         if(info[i].state) str = $("<tr class='state" + info[i].state + "'></tr>");
 
-        $("<td width='1%'>" + mark + x + "</td>").appendTo(str);
+        $("<td width='1%'>" + x + "</td>").appendTo(str); // LVの値が `header.json` にならないよう修正
         $("<td width='1%' align='center'>" + (info[i].youtube ? "<a href='" + info[i].youtube + "' target='_blank'><img src='style/youtube.gif' border='0' alt='Youtube' /></a>" : "") + "</td>").appendTo(str);
         $("<td width='1%' align='center'><a href='https://bms-score-viewer.pages.dev/view?md5=" + info[i].md5 + "' target='_blank'>■</a></td>").appendTo(str);
         $("<td width='13%'><a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + info[i].md5 + "' target='_blank'>" + info[i].title + "</a></td>").appendTo(str);
@@ -179,10 +178,6 @@ function makeBMSTable(info, mark, order) {
 
         str.appendTo(obj);
         count++;
-    }
-
-    if (obj_sep != null) {
-        obj_sep.html("<td colspan='11' align='center'><b>" + mark + x + " (" + count + "譜面)</b></td>");
     }
 }
 
