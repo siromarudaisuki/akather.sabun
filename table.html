@@ -79,11 +79,8 @@ function makeBMSTable(info, mark, order) {
     let obj = $("#table_int");
     obj.html("");
 
-    // 元に戻す用
-    const initialInfo = JSON.parse(JSON.stringify(info));
-
-    // 表示/非表示切り替えボタン
-    let toggleButton = $("<button id='toggleRows' style='margin-bottom:10px;'>区切り行を非表示にする</button>");
+    // 表示/非表示切り替えボタンの追加
+    let toggleButton = $("<button id='toggleRows'>区切り行を非表示にする</button>");
     toggleButton.on("click", function() {
         let isHidden = $(".tr_separate").is(":hidden");
         $(".tr_separate").toggle();
@@ -91,36 +88,11 @@ function makeBMSTable(info, mark, order) {
     });
     obj.before(toggleButton);
 
-    // 元の状態に戻すボタン
-    let resetButton = $("<button id='resetTable' style='margin-bottom:10px; margin-left:10px;'>元の状態に戻す</button>");
-    resetButton.on("click", function() {
-        makeBMSTable(initialInfo, mark, order); // 初期データを使って再生成
-    });
-    obj.before(resetButton);
-
     let headerRow = $("<tr height='20' style='color:white;background-color:#666666'></tr>");
     let headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "差分", "BPM", "total", "追加日時", "コメント"];
     let sortableIndexes = ["LV", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "BPM", "total", "追加日時", "コメント"];
     let sortState = {};
 
-	function comparer(index, columnName, ascending) {
-        return function(a, b) {
-            let valA = $(a).children("td").eq(index).text();
-            let valB = $(b).children("td").eq(index).text();
-
-            if (columnName === "total") {
-                return parseFloat(valA) - parseFloat(valB);
-            }
-            else if (columnName === "追加日時") {
-                return new Date(valA) - new Date(valB);
-            }
-            else if ($.isNumeric(valA) && $.isNumeric(valB)) {
-                return valA - valB;
-            } else {
-                return valA.localeCompare(valB);
-            }
-        };
-    }
     headers.forEach((text, index) => {
         let headerCell = $("<td align='center'>" + text + "</td>");
         
@@ -154,11 +126,31 @@ function makeBMSTable(info, mark, order) {
 
         headerRow.append(headerCell);
     });
+
     headerRow.appendTo(obj);
 
+    function comparer(index, columnName, ascending) {
+        return function(a, b) {
+            let valA = $(a).children("td").eq(index).text();
+            let valB = $(b).children("td").eq(index).text();
+
+            if (columnName === "total") {
+                return parseFloat(valA) - parseFloat(valB);
+            }
+            else if (columnName === "追加日時") {
+                return new Date(valA) - new Date(valB);
+            }
+            else if ($.isNumeric(valA) && $.isNumeric(valB)) {
+                return valA - valB;
+            } else {
+                return valA.localeCompare(valB);
+            }
+        };
+    }
 
     let obj_sep = null;
     let x = "", count = 0;
+
     for (let i = 0; i < info.length; i++) {
         if (x != info[i].level) {
             if (obj_sep != null) {
