@@ -56,7 +56,9 @@ function menu(tName){
 
 // 'GASを使ってスプレッドシートからjsonに変換した差分情報'を取得
 $(document).ready(function(){
-    // ボタンのコンテナをテーブルの上に中央配置
+    // 最初に読み込んだ値を保持
+    const bmstableContent = $("meta[name=bmstable]").attr("content");
+
     let buttonContainer = $("<div class='table-buttons'></div>").insertBefore("#table_int");  
     let toggleButton = $("<button id='toggleRows'>区切り行を非表示にする</button>").appendTo(buttonContainer);
     let resetButton = $("<button id='resetTable'>元の状態に戻す</button>").appendTo(buttonContainer);
@@ -67,9 +69,11 @@ $(document).ready(function(){
         $(this).text(isHidden ? "区切り行を非表示にする" : "区切り行を表示する");
     });
 
-    // 初期データを保存
+    // 初期データを保持する変数
     let initialInfo;
-    $.getJSON($("meta[name=bmstable]").attr("content"), function(header){
+
+    // JSONデータを取得
+    $.getJSON(bmstableContent, function(header){
         $.getJSON(header.data_url, function(information){
             initialInfo = JSON.parse(JSON.stringify(information)); // 深いコピーで保存
 
@@ -81,10 +85,19 @@ $(document).ready(function(){
         });
     });
 
+    // Resetボタンの処理
     resetButton.on("click", function() {
         $("#table_int").html(""); // テーブルをクリア
         if(initialInfo) {
-            makeBMSTable(initialInfo, $("meta[name=bmstable]").attr("content")); // 初期データで再生成
+            $.getJSON(bmstableContent, function(header){
+                console.log("Reset時の header.symbol:", header.symbol); // デバッグ用
+
+                if(header["level"]) {
+                    makeBMSTable(initialInfo, header.symbol, header["level"]); // 初期データで再生成
+                } else {
+                    makeBMSTable(initialInfo, header.symbol); // 初期データで再生成
+                }
+            });
         }
     });
 });
