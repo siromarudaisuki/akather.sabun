@@ -56,19 +56,37 @@ function menu(tName){
 
 // 'GASを使ってスプレッドシートからjsonに変換した差分情報'を取得
 $(document).ready(function(){
-	$.getJSON($("meta[name=bmstable]").attr("content"), function(header){
-		$.getJSON(header.data_url, function(information){
-			// headerのsort有無で分岐
-			if(header["level"])
-			{
-				makeBMSTable(information,header.symbol,header["level"]);
-			} 
-			else 
-			{
-				makeBMSTable(information,header.symbol);
-			}
-		});
-	});
+    // ボタンをページの上部に追加
+    let buttonContainer = $("<div class='table-buttons'></div>").appendTo("body");  
+    let toggleButton = $("<button id='toggleRows'>区切り行を非表示にする</button>").appendTo(buttonContainer);
+    let resetButton = $("<button id='resetTable'>元の状態に戻す</button>").appendTo(buttonContainer);
+
+    toggleButton.on("click", function() {
+        let isHidden = $(".tr_separate").is(":hidden");
+        $(".tr_separate").toggle();
+        $(this).text(isHidden ? "区切り行を非表示にする" : "区切り行を表示する");
+    });
+
+    // 初期データを保存しておく
+    let initialInfo;
+    $.getJSON($("meta[name=bmstable]").attr("content"), function(header){
+        $.getJSON(header.data_url, function(information){
+            initialInfo = JSON.parse(JSON.stringify(information)); // 深いコピーで保存
+
+            if(header["level"]) {
+                makeBMSTable(information, header.symbol, header["level"]);
+            } else {
+                makeBMSTable(information, header.symbol);
+            }
+        });
+    });
+
+    resetButton.on("click", function() {
+        $("#table_int").html(""); // テーブルをクリア
+        if(initialInfo) {
+            makeBMSTable(initialInfo, $("meta[name=bmstable]").attr("content")); // 初期データで再生成
+        }
+    });
 });
 
 
@@ -78,22 +96,6 @@ function makeBMSTable(info, mark, order) {
 
     let obj = $("#table_int");
     obj.html("");
-
-    // 初期データを保存
-    const initialInfo = JSON.parse(JSON.stringify(info));
-
-    // ボタンを追加（表の外に配置）
-    const buttonContainer = $("<div class='table-buttons'></div>");
-    let toggleButton = $("<button id='toggleRows'>区切り行を非表示にする</button>");
-
-    toggleButton.on("click", function() {
-        let isHidden = $(".tr_separate").is(":hidden");
-        $(".tr_separate").toggle();
-        $(this).text(isHidden ? "区切り行を非表示にする" : "区切り行を表示する");
-    });
-
-    buttonContainer.append(toggleButton);
-    obj.before(buttonContainer);
 
     let headerRow = $("<tr height='20' style='color:white;background-color:#666666'></tr>");
     let headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "差分", "BPM", "total", "追加日時", "コメント"];
@@ -112,7 +114,7 @@ function makeBMSTable(info, mark, order) {
                 if (!sortState[index]) { rows.reverse(); }
 
                 $(".tr_separate").hide();
-                toggleButton.text("区切り行を表示する");
+                $("#toggleRows").text("区切り行を表示する");
 
                 headerRow.find("td").removeClass("sort-asc sort-desc");
                 headerCell.addClass(sortState[index] ? "sort-asc" : "sort-desc");
@@ -132,12 +134,12 @@ function makeBMSTable(info, mark, order) {
             let valB = $(b).children("td").eq(index).text();
 
             if (columnName === "total") {
-                if (valA === "('ω')｡o(?)") return 1; // 一番下にする
+                if (valA === "('ω')｡o(?)") return 1;
                 if (valB === "('ω')｡o(?)") return -1;
                 return parseFloat(valA) - parseFloat(valB);
             }
             else if (columnName === "追加日時") {
-                return new Date(valA) - new Date(valB);
+                return new Date(valA.replace(/\//g, "-")) - new Date(valB.replace(/\//g, "-"));
             }
             else if ($.isNumeric(valA) && $.isNumeric(valB)) {
                 return valA - valB;

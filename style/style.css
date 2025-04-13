@@ -120,17 +120,26 @@ td[sortable].sort-desc:after {
   gap: 10px;
   margin-bottom: 10px;
 }
+
 button {
   font-size: 14px;
-  padding: 5px 10px;
-  color: #ffffff;
-  background: linear-gradient(90deg, #4CAF50, #81C784);
-  border: 1px solid #388E3C;
+  padding: 6px 12px;
+  color: #fff;
+  background: linear-gradient(90deg, #333, #555);
+  border: 1px solid #222;
   border-radius: 5px;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
+
 button:hover {
-  background: linear-gradient(90deg, #81C784, #4CAF50);
-  transform: scale(1.03);
+  background: linear-gradient(90deg, #555, #777);
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+  transform: scale(1.05);
+}
+
+button:active {
+  background: linear-gradient(90deg, #222, #444);
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.6);
 }
