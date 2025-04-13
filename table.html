@@ -147,8 +147,10 @@
 					return parseFloat(valA) - parseFloat(valB);
 				}
 				else if (columnName === "追加日時") {
-					if (valA === "('ω')｡o(?)") return 1; // 一番下に配置
-					if (valB === "('ω')｡o(?)") return -1;
+					// "('ω')｡o(?)" は常に一番下に配置する
+					if (valA === "('ω')｡o(?)" && valB === "('ω')｡o(?)") { return 0; }
+        			if (valA === "('ω')｡o(?)") { return sortState[sortableIndexes[columnName]] ? 1 : -1; } // 昇順なら1、降順なら-1
+        			if (valB === "('ω')｡o(?)") { return sortState[sortableIndexes[columnName]] ? -1 : 1; } // 昇順なら-1、降順なら1
 	
 					let aDateParts = valA.split("/").map(num => parseInt(num) || 0);
 					let bDateParts = valB.split("/").map(num => parseInt(num) || 0);
