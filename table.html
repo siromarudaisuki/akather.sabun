@@ -94,9 +94,8 @@ $(document).ready(function() {
             });
         }
     });
-});
 
-function makeBMSTable(info, mark, order) {
+    function makeBMSTable(info, mark, order) {
         if (typeof order === 'undefined') order = null;
 
         let obj = $("#table_int");
@@ -133,8 +132,8 @@ function makeBMSTable(info, mark, order) {
 
 		function comparer(index, columnName) {
 		    return function(a, b) {
-		        let valA = $(a).children("td").eq(index).html(); // 現在のHTMLを取得
-		        let valB = $(b).children("td").eq(index).html();
+		        let valA = $(a).children("td").eq(index).html() || ""; // 現在のHTMLを取得
+		        let valB = $(b).children("td").eq(index).html() || "";
 			
 		        // 追加日時カラム専用の処理
 		        if (columnName === "追加日時") {
@@ -214,6 +213,7 @@ function makeBMSTable(info, mark, order) {
             obj_sep.html("<td colspan='11' align='center'><b>" + mark + " " + x + " (" + count + "譜面)</b></td>");
         }
     }
+});
 </script>
 </body>
 </html>
