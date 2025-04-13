@@ -56,12 +56,13 @@ function menu(tName){
 
 // 'GASを使ってスプレッドシートからjsonに変換した差分情報'を取得
 $(document).ready(function(){
-    // 最初に読み込んだ値を保持
-    const bmstableContent = $("meta[name=bmstable]").attr("content");
-
+    // ボタンのコンテナをテーブルの上部に中央配置
     let buttonContainer = $("<div class='table-buttons'></div>").insertBefore("#table_int");  
-    let toggleButton = $("<button id='toggleRows'>区切り行を非表示にする</button>").appendTo(buttonContainer);
-    let resetButton = $("<button id='resetTable'>元の状態に戻す</button>").appendTo(buttonContainer);
+    let toggleButton = $("<button id='toggleRows' style='display: none;'>区切り行を非表示にする</button>").appendTo(buttonContainer); // デフォルト非表示
+    let resetButton = $("<button id='resetTable' style='display: none;'>元の状態に戻す</button>").appendTo(buttonContainer); // デフォルト非表示
+
+    let initialInfo; // 初期データを保持
+    const bmstableContent = $("meta[name=bmstable]").attr("content");
 
     toggleButton.on("click", function() {
         let isHidden = $(".tr_separate").is(":hidden");
@@ -69,8 +70,22 @@ $(document).ready(function(){
         $(this).text(isHidden ? "区切り行を非表示にする" : "区切り行を表示する");
     });
 
-    // 初期データを保持する変数
-    let initialInfo;
+    resetButton.on("click", function() {
+        $("#table_int").html(""); // テーブルをクリア
+        if(initialInfo) {
+            $.getJSON(bmstableContent, function(header){
+                console.log("Reset時の header.symbol:", header.symbol); // デバッグ用
+                if(header["level"]) {
+                    makeBMSTable(initialInfo, header.symbol, header["level"]); // 初期データで再生成
+                } else {
+                    makeBMSTable(initialInfo, header.symbol); // 初期データで再生成
+                }
+                // リセット時のボタン表示状態を調整
+                toggleButton.show(); 
+                resetButton.hide(); // 元の状態に戻すボタン非表示
+            });
+        }
+    });
 
     // JSONデータを取得
     $.getJSON(bmstableContent, function(header){
@@ -82,30 +97,25 @@ $(document).ready(function(){
             } else {
                 makeBMSTable(information, header.symbol);
             }
+            // 初期状態でのボタン表示調整
+            toggleButton.show(); // 区切り行を非表示にするボタンを表示
+            resetButton.hide(); // 元の状態に戻すボタン非表示
         });
     });
 
-    // Resetボタンの処理
-    resetButton.on("click", function() {
-        $("#table_int").html(""); // テーブルをクリア
-        if(initialInfo) {
-            $.getJSON(bmstableContent, function(header){
-                console.log("Reset時の header.symbol:", header.symbol); // デバッグ用
-
-                if(header["level"]) {
-                    makeBMSTable(initialInfo, header.symbol, header["level"]); // 初期データで再生成
-                } else {
-                    makeBMSTable(initialInfo, header.symbol); // 初期データで再生成
-                }
-            });
+    function handleSortButtonDisplay(sortApplied) {
+        if (sortApplied) {
+            resetButton.show(); // ソート時、元の状態に戻すボタンを表示
+            toggleButton.hide(); // 区切り行非表示ボタンを非表示
+        } else {
+            resetButton.hide(); // 通常時、元の状態に戻すボタンを非表示
+            toggleButton.show(); // 通常時、区切り行非表示ボタンを表示
         }
-    });
+    }
 });
 
 // BMSテーブル構築
 function makeBMSTable(info, mark, order) {
-    if (typeof order === 'undefined') order = null;
-
     let obj = $("#table_int");
     obj.html("");
 
@@ -126,84 +136,19 @@ function makeBMSTable(info, mark, order) {
                 if (!sortState[index]) { rows.reverse(); }
 
                 $(".tr_separate").hide();
-                $("#toggleRows").text("区切り行を表示する");
-
-                headerRow.find("td").removeClass("sort-asc sort-desc");
-                headerCell.addClass(sortState[index] ? "sort-asc" : "sort-desc");
-
                 obj.append(rows);
+
+                handleSortButtonDisplay(true); // ソートが実行された場合にボタンを調整
             });
         }
 
         headerRow.append(headerCell);
     });
+
     headerRow.appendTo(obj);
 
-    function comparer(index, columnName) {
-	    return function(a, b) {
-	        let valA = $(a).children("td").eq(index).text();
-	        let valB = $(b).children("td").eq(index).text();
-
-	        if (columnName === "total") {
-	            return parseFloat(valA) - parseFloat(valB);
-	        }
-	        else if (columnName === "追加日時") {
-	            if (valA === "('ω')｡o(?)") return 1; // 一番下に配置
-	            if (valB === "('ω')｡o(?)") return -1;
-
-	            let aDateParts = valA.split("/").map(num => parseInt(num) || 0);
-	            let bDateParts = valB.split("/").map(num => parseInt(num) || 0);
-	            let minLen = Math.min(aDateParts.length, bDateParts.length);
-	            for (let i = 0; i < minLen; i++) {
-	                if (aDateParts[i] !== bDateParts[i]) {
-	                    return aDateParts[i] - bDateParts[i];
-	                }
-	            }
-	            return 0;
-	        }
-	        else if ($.isNumeric(valA) && $.isNumeric(valB)) {
-	            return valA - valB;
-	        } else {
-	            return valA.localeCompare(valB);
-	        }
-	    };
-	}
-
-    let obj_sep = null;
-    let x = "", count = 0;
-
-    for (let i = 0; i < info.length; i++) {
-        if (x !== info[i].level) {
-            if (obj_sep !== null) {
-                obj_sep.html("<td colspan='11' align='center'><b>" + mark + " " + x + " (" + count + "譜面)</b></td>");
-            }
-            obj_sep = $("<tr class='tr_separate' id='" + mark + info[i].level + "'></tr>");
-            obj_sep.appendTo(obj);
-            count = 0;
-            x = info[i].level;
-        }
-
-        let str = $("<tr class='tr_normal'></tr>");
-        if(info[i].state) str = $("<tr class='state" + info[i].state + "'></tr>");
-
-        $("<td width='1%'>" + mark + " " + x + "</td>").appendTo(str);
-        $("<td width='1%' align='center'>" + (info[i].youtube ? "<a href='" + info[i].youtube + "' target='_blank'><img src='style/youtube.gif' border='0' alt='Youtube' /></a>" : "") + "</td>").appendTo(str);
-        $("<td width='1%' align='center'><a href='https://bms-score-viewer.pages.dev/view?md5=" + info[i].md5 + "' target='_blank'>■</a></td>").appendTo(str);
-        $("<td width='13%'><a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + info[i].md5 + "' target='_blank'>" + info[i].title + "</a></td>").appendTo(str);
-        $("<td width='5%'>" + (info[i].artist ? "<a href='" + info[i].url + "' target='_blank'>" + info[i].artist + "</a>" : "") + "</td>").appendTo(str);
-        $("<td width='1%'>DL</td>").appendTo(str);
-        $("<td width='1%'>" + info[i].bpm + "</td>").appendTo(str);
-        $("<td width='1%'>" + info[i].total + "/" + info[i].totalnote + "</td>").appendTo(str);
-        $("<td width='1%'>" + (info[i].year ? (info[i].year + "/" + (info[i].month || 0) + "/" + (info[i].day || 0)) : "('ω')｡o(?)") + "</td>").appendTo(str);
-        $("<td width='10%'>" + info[i].comment + "</td>").appendTo(str);
-
-        str.appendTo(obj);
-        count++;
-    }
-
-    if (obj_sep !== null) {
-        obj_sep.html("<td colspan='11' align='center'><b>" + mark + " " + x + " (" + count + "譜面)</b></td>");
-    }
+    // 初期状態の表示でボタンを調整
+    handleSortButtonDisplay(false);
 }
 
 // 過去の手書きコード
