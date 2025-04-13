@@ -181,7 +181,21 @@ function sortTable(table, columnIndex, columnName, sortState) {
         return sortState[columnIndex] ? valB.localeCompare(valA) : valA.localeCompare(valB);
     });
 
+    // ソート後の行をテーブルに再描画
     table.append(rows);
+
+    // ヘッダーの昇順・降順スタイルを更新
+    const headerCells = table.find("tr:first-child td[sortable]");
+    headerCells.removeClass("sort-asc sort-desc"); // スタイルをリセット
+
+    const targetHeaderCell = headerCells.eq(columnIndex);
+    if (sortState[columnIndex]) {
+        targetHeaderCell.addClass("sort-asc"); // 昇順スタイルを適用
+    } else {
+        targetHeaderCell.addClass("sort-desc"); // 降順スタイルを適用
+    }
+
+    // ソート状態を反転
     sortState[columnIndex] = !sortState[columnIndex];
 }
 
