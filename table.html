@@ -196,7 +196,7 @@ $(document).ready(function() {
             $("<td width='1%' align='center'><a href='https://bms-score-viewer.pages.dev/view?md5=" + info[i].md5 + "' target='_blank'>■</a></td>").appendTo(str);
             $("<td width='13%'><a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + info[i].md5 + "' target='_blank'>" + info[i].title + "</a></td>").appendTo(str);
             $("<td width='5%'>" + (info[i].artist ? "<a href='" + info[i].url + "' target='_blank'>" + info[i].artist + "</a>" : "") + "</td>").appendTo(str);
-            $("<td width='1%'>DL</td>").appendTo(str);
+            $("<td width='1%'>" ((info[i].state == 1) ? "" : "<a href='sabun/★" + info[i].level + " " + info[i].title + ".zip'>" + "DL" + "</a>") + "</td>").appendTo(str);
             $("<td width='1%'>" + info[i].bpm + "</td>").appendTo(str);
             $("<td width='1%'>" + info[i].total + "/" + info[i].totalnote + "</td>").appendTo(str);
             $("<td width='1%'>" + (info[i].year ? (info[i].year + "/" + (info[i].month || 0) + "/" + (info[i].day || 0)) : "<font color='#666666'>('ω')｡o(?)</font>") + "</td>").appendTo(str);
