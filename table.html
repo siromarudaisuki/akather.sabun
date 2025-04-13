@@ -76,29 +76,64 @@ function makeBMSTable(info, mark, order) {
     let obj = $("#table_int");
     obj.html("");
 
-    let headerRow = $("<tr height='20' style='color:white;background-color:#666666'></tr>");
-    let headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略)(本体リンク)", "差分", "BPM", "total", "追加日時", "コメント"];
+    // 表示/非表示切り替えボタン
+    let toggleButton = $("<button id='toggleRows' style='margin-bottom:10px;'>難易度区切り行 を非表示</button>");
+    toggleButton.on("click", function() {
+        let isHidden = $(".tr_separate").is(":hidden");
+        $(".tr_separate").toggle();
+        $(this).text(isHidden ? "難易度区切り行 を非表示" : "難易度区切り行 を表示");
+    });
+    obj.before(toggleButton);
 
+    let headerRow = $("<tr height='20' style='color:white;background-color:#666666'></tr>");
+    let headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "差分", "BPM", "total", "追加日時", "コメント"];
+    let sortableIndexes = ["LV", "タイトル(IRリンク)", "作者(敬称略)<br/>(本体リンク)", "BPM", "total", "追加日時", "コメント"];
+    let sortState = {};
+
+	// ソート用カラム構築
     headers.forEach((text, index) => {
-        let headerCell = $("<td align='center' sortable>" + text + "</td>");
-        headerCell.css("cursor", "pointer");
-        headerCell.on("click", function() {
-            let rows = obj.find("tr:gt(0)").toArray().sort(comparer(index));
-            this.asc = !this.asc;
-            if (!this.asc) { rows.reverse(); }
-            obj.append(rows);
-        });
+        let headerCell = $("<td align='center'>" + text + "</td>");
+        
+        if (sortableIndexes.includes(text)) {
+            headerCell.attr("sortable", true);
+            headerCell.css("cursor", "pointer");
+            headerCell.on("click", function() {
+                sortState[index] = !sortState[index]; // ソート方向を切り替え
+                let rows = obj.find("tr:gt(0)").toArray().sort(comparer(index, text, sortState[index]));
+                if (!sortState[index]) { rows.reverse(); }
+
+                // 区切り行を自動で非表示にする
+                $(".tr_separate").hide();
+                $("#toggleRows").text("区切り行を表示する");
+
+                headerRow.find("td").each((i, td) => {
+                    if (sortableIndexes.includes(headers[i])) {
+                        $(td).text(headers[i]); // ソートアイコンのリセット
+                    }
+                });
+
+                headerCell.text(text + (sortState[index] ? " ▲" : " ▼")); // ソート方向表示
+                obj.append(rows);
+            });
+        }
+
         headerRow.append(headerCell);
     });
 
     headerRow.appendTo(obj);
 
-    function comparer(index) {
+    function comparer(index, columnName, ascending) {
         return function(a, b) {
             let valA = $(a).children("td").eq(index).text();
             let valB = $(b).children("td").eq(index).text();
 
-            if ($.isNumeric(valA) && $.isNumeric(valB)) {
+            if (columnName === "total") {
+                return parseFloat(valA) - parseFloat(valB);
+            }
+            else if (columnName === "追加日時") {
+                return new Date(valA) - new Date(valB);
+            }
+            else if ($.isNumeric(valA) && $.isNumeric(valB)) {
                 return valA - valB;
             } else {
                 return valA.localeCompare(valB);
@@ -128,9 +163,9 @@ function makeBMSTable(info, mark, order) {
         $("<td width='1%' align='center'><a href='https://bms-score-viewer.pages.dev/view?md5=" + info[i].md5 + "' target='_blank'>■</a></td>").appendTo(str);
         $("<td width='13%'><a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + info[i].md5 + "' target='_blank'>" + info[i].title + "</a></td>").appendTo(str);
         $("<td width='5%'>" + (info[i].artist ? "<a href='" + info[i].url + "' target='_blank'>" + info[i].artist + "</a>" : "") + "</td>").appendTo(str);
-        $("<td width='1%'><a href='sabun/★" + info[i].level + " " + info[i].title + ".zip'>DL</a></td>").appendTo(str);
+        $("<td width='1%'>DL</td>").appendTo(str); // 差分はソート対象外なので変更なし
         $("<td width='1%'>" + info[i].bpm + "</td>").appendTo(str);
-        $("<td width='1%'>" + info[i].total + "/" + info[i].totalnote + "</td>").appendTo(str);
+        $("<td width='1%'>" + info[i].total + "</td>").appendTo(str);
         $("<td width='1%'>" + (info[i].year ? (info[i].year + "/" + (info[i].month || "") + "/" + (info[i].day || "")) : "('ω')｡o(?)") + "</td>").appendTo(str);
         $("<td width='10%'>" + info[i].comment + "</td>").appendTo(str);
 
@@ -142,7 +177,6 @@ function makeBMSTable(info, mark, order) {
         obj_sep.html("<td colspan='11' align='center'><b>" + mark + x + " (" + count + "譜面)</b></td>");
     }
 }
-
 
 // 過去の手書きコード
 /*
