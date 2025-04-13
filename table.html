@@ -202,7 +202,7 @@ $(document).ready(function() {
             $("<td width='1%'>DL</td>").appendTo(str);
             $("<td width='1%'>" + info[i].bpm + "</td>").appendTo(str);
             $("<td width='1%'>" + info[i].total + "/" + info[i].totalnote + "</td>").appendTo(str);
-            $("<td width='1%'>" + (info[i].year ? (info[i].year + "/" + (info[i].month || 0) + "/" + (info[i].day || 0)) : "<font color='#7d7d7d'>('ω')｡o(?)</font>") + "</td>").appendTo(str);
+            $("<td width='1%'>" + (info[i].year ? (info[i].year + "/" + (info[i].month || 0) + "/" + (info[i].day || 0)) : "('ω')｡o(?)") + "</td>").appendTo(str);
             $("<td width='10%'>" + info[i].comment + "</td>").appendTo(str);
 
             str.appendTo(obj);
