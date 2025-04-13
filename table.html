@@ -92,6 +92,7 @@ $(document).ready(function(){
 // BMSテーブル構築
 function makeBMSTable(info, mark, order) {
     if (typeof order === 'undefined') order = null;
+    console.log("受け取った mark:", mark);
 
     let obj = $("#table_int");
     obj.html("");
