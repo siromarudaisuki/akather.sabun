@@ -99,20 +99,21 @@ function generateTable(data, symbol, level = null) {
     const table = $("#table_int");
     table.html(""); // テーブル内容をクリア
 
-    const headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "差分", "BPM", "total", "追加日時", "コメント"];
-    const sortableColumns = ["LV", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "BPM", "total", "追加日時", "コメント"];
-    let sortState = {}; // ソート状態を保持
+    // ヘッダー作成処理
+	const headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "差分", "BPM", "total", "追加日時", "コメント"];
+	const sortableColumns = ["LV", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "BPM", "total", "追加日時", "コメント"];
+	let sortState = {}; // ソート状態を保持
 
-    // ヘッダー行作成
-    const headerRow = $("<tr height='20' style='color:white;background-color:#666666'></tr>");
-    headers.forEach((headerText, index) => {
-        const cell = $("<td align='center'>" + headerText + "</td>");
-        if (sortableColumns.includes(headerText)) {
-            cell.css("cursor", "pointer").on("click", () => sortTable(table, index, headerText, sortState));
-        }
-        headerRow.append(cell);
-    });
-    table.append(headerRow);
+	headers.forEach((headerText, index) => {
+	    const cell = $("<td align='center'>" + headerText + "</td>");
+	    if (sortableColumns.includes(headerText)) {
+	        // ソート可能な列のマークアップ
+	        cell.attr("sortable", true).addClass("sortable-column").css("cursor", "pointer").on("click", function() {
+	            sortTable($("#table_int"), index, headerText, sortState);
+	        });
+	    }
+	    headerRow.append(cell);
+	});
 
     // データ行作成
     let currentLevel = "";
@@ -152,17 +153,47 @@ function generateTable(data, symbol, level = null) {
 
 // ソート機能
 function sortTable(table, columnIndex, columnName, sortState) {
-    const rows = table.find("tr:gt(0)").toArray().sort((rowA, rowB) => {
+    const rows = table.find("tr:gt(0)").toArray(); // データ行を取得
+    const separatorRows = $(".tr_separate"); // 区切り行を取得
+
+    // 区切り行を非表示にする
+    separatorRows.hide();
+
+    // データ行のソート処理
+    rows.sort((rowA, rowB) => {
         const valA = $(rowA).children("td").eq(columnIndex).text();
         const valB = $(rowB).children("td").eq(columnIndex).text();
-        if ($.isNumeric(valA) && $.isNumeric(valB)) {
-            return valA - valB;
-        } else {
-            return valA.localeCompare(valB);
+
+        // 特殊なカラム（例: 追加日時）の比較処理
+        if (columnName === "追加日時") {
+            const aDateParts = valA.split("/").map(num => parseInt(num) || 0);
+            const bDateParts = valB.split("/").map(num => parseInt(num) || 0);
+
+            if (valA === "('ω')｡o(?)" || valB === "('ω')｡o(?)") {
+                return sortState[columnIndex] ? (valA === "('ω')｡o(?)" ? 1 : -1) : (valA === "('ω')｡o(?)" ? -1 : 1);
+            }
+
+            for (let i = 0; i < Math.min(aDateParts.length, bDateParts.length); i++) {
+                if (aDateParts[i] !== bDateParts[i]) {
+                    return sortState[columnIndex] ? bDateParts[i] - aDateParts[i] : aDateParts[i] - bDateParts[i];
+                }
+            }
+            return 0;
         }
+
+        // 数値カラムのソート
+        if ($.isNumeric(valA) && $.isNumeric(valB)) {
+            return sortState[columnIndex] ? valB - valA : valA - valB;
+        }
+
+        // 文字列カラムのソート
+        return sortState[columnIndex] ? valB.localeCompare(valA) : valA.localeCompare(valB);
     });
-    if (!sortState[columnIndex]) rows.reverse();
+
+    // ソート後の行をテーブルに再描画
     table.append(rows);
+
+    // ソート状態を反転
     sortState[columnIndex] = !sortState[columnIndex];
 }
 
