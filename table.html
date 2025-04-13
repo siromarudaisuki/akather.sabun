@@ -42,37 +42,35 @@
 <script language="javascript" type="text/javascript">
 
 // メニュー開閉
+// メニュー開閉
 function toggleMenu(tName) {
     const tMenu = document.getElementById(tName).style;
     tMenu.display = (tMenu.display === 'none') ? "block" : "none";
 }
 
 // JSONデータを取得してテーブル生成
-$(document).ready(function() {
-    const bmstableContent = $("meta[name=bmstable]").attr("content"); // 最初に読み込んだ値を保持
-    let initialData; // 初期データの保存
+$(document).ready(function () {
+    const bmstableContent = $("meta[name=bmstable]").attr("content"); // 初期データの取得
+    let initialData; // 初期データを保存する変数
 
-    // ボタンコンテナ生成
+    // ボタン生成
     const buttonContainer = $("<div class='table-buttons'></div>").insertBefore("#table_int");
-    $("<button id='toggleRows'>区切り行を非表示にする</button>").appendTo(buttonContainer)
-        .on("click", toggleRowsVisibility);
+    $("<button id='toggleRows'>区切り行を非表示にする</button>").appendTo(buttonContainer).on("click", toggleRowsVisibility);
+    $("<button id='resetTable'>元の状態に戻す</button>").appendTo(buttonContainer).on("click", resetTable);
 
-    $("<button id='resetTable'>元の状態に戻す</button>").appendTo(buttonContainer)
-        .on("click", resetTable);
-
-    // JSONデータの取得とテーブル生成
+    // JSONデータの取得処理
     $.getJSON(bmstableContent)
-        .done(function(header) {
+        .done(function (header) {
             $.getJSON(header.data_url)
-                .done(function(data) {
-                    initialData = JSON.parse(JSON.stringify(data)); // 深いコピーで保存
+                .done(function (data) {
+                    initialData = JSON.parse(JSON.stringify(data)); // 初期データの深いコピー
                     generateTable(data, header.symbol, header.level);
                 })
-                .fail(function() {
+                .fail(function () {
                     alert("データの取得に失敗しました。");
                 });
         })
-        .fail(function() {
+        .fail(function () {
             alert("ヘッダー情報の取得に失敗しました。");
         });
 });
@@ -94,28 +92,27 @@ function resetTable() {
     }
 }
 
-// 汎用テーブル生成関数
+// テーブル生成関数
 function generateTable(data, symbol, level = null) {
     const table = $("#table_int");
-    table.html(""); // テーブル内容をクリア
+    table.html(""); // テーブルのクリア
 
-    // ヘッダー作成処理
-	const headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "差分", "BPM", "total", "追加日時", "コメント"];
-	const sortableColumns = ["LV", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "BPM", "total", "追加日時", "コメント"];
-	let sortState = {}; // ソート状態を保持
+    const headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "差分", "BPM", "total", "追加日時", "コメント"];
+    const sortableColumns = ["LV", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "BPM", "total", "追加日時", "コメント"];
+    let sortState = {}; // ソート状態を保持
 
-	headers.forEach((headerText, index) => {
-	    const cell = $("<td align='center'>" + headerText + "</td>");
-	    if (sortableColumns.includes(headerText)) {
-	        // ソート可能な列のマークアップ
-	        cell.attr("sortable", true).addClass("sortable-column").css("cursor", "pointer").on("click", function() {
-	            sortTable($("#table_int"), index, headerText, sortState);
-	        });
-	    }
-	    headerRow.append(cell);
-	});
+    // ヘッダー行作成
+    const headerRow = $("<tr height='20' style='color:white;background-color:#666666'></tr>");
+    headers.forEach((headerText, index) => {
+        const cell = $("<td align='center'>" + headerText + "</td>");
+        if (sortableColumns.includes(headerText)) {
+            cell.attr("sortable", true).addClass("sortable-column").on("click", () => sortTable(table, index, headerText, sortState));
+        }
+        headerRow.append(cell);
+    });
+    table.append(headerRow);
 
-    // データ行作成
+    // データ行生成
     let currentLevel = "";
     let count = 0;
     let separatorRow = null;
@@ -145,26 +142,22 @@ function generateTable(data, symbol, level = null) {
         count++;
     });
 
-    // 最後の区切り行
     if (separatorRow) {
         separatorRow.html(`<td colspan='11' align='center'><b>${symbol} ${currentLevel} (${count}譜面)</b></td>`);
     }
 }
 
-// ソート機能
+// ソート処理
 function sortTable(table, columnIndex, columnName, sortState) {
-    const rows = table.find("tr:gt(0)").toArray(); // データ行を取得
-    const separatorRows = $(".tr_separate"); // 区切り行を取得
+    const rows = table.find("tr:gt(0)").toArray(); // データ行
+    const separatorRows = $(".tr_separate"); // 区切り行
 
-    // 区切り行を非表示にする
-    separatorRows.hide();
+    separatorRows.hide(); // 区切り行を非表示
 
-    // データ行のソート処理
     rows.sort((rowA, rowB) => {
         const valA = $(rowA).children("td").eq(columnIndex).text();
         const valB = $(rowB).children("td").eq(columnIndex).text();
 
-        // 特殊なカラム（例: 追加日時）の比較処理
         if (columnName === "追加日時") {
             const aDateParts = valA.split("/").map(num => parseInt(num) || 0);
             const bDateParts = valB.split("/").map(num => parseInt(num) || 0);
@@ -181,19 +174,14 @@ function sortTable(table, columnIndex, columnName, sortState) {
             return 0;
         }
 
-        // 数値カラムのソート
         if ($.isNumeric(valA) && $.isNumeric(valB)) {
             return sortState[columnIndex] ? valB - valA : valA - valB;
         }
 
-        // 文字列カラムのソート
         return sortState[columnIndex] ? valB.localeCompare(valA) : valA.localeCompare(valB);
     });
 
-    // ソート後の行をテーブルに再描画
     table.append(rows);
-
-    // ソート状態を反転
     sortState[columnIndex] = !sortState[columnIndex];
 }
 
