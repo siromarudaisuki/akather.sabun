@@ -165,18 +165,18 @@ function makeBMSTable(info, mark, order) {
     for (let i = 0; i < info.length; i++) 
 	{
         // 難度ごとの区切り
-        if (x != info[i].level) 
-		{
-            // 前の区切りに譜面数、平均密度を追加
-			if (obj_sep != null) 
-			{
-                obj_sep.html("<td colspan=11 align='center'>" + "<b>" + mark + x + " (" + count + "譜面)</b></td>");
-            }
-            obj_sep = $("<tr class='tr_separate' id='" + mark + info[i].level + "'></tr>");
-            obj_sep.appendTo(obj);
-            count = 0;
-            x = info[i].level;
-        }
+        //if (x != info[i].level) 
+		//{
+        //    // 前の区切りに譜面数、平均密度を追加
+		//	if (obj_sep != null) 
+		//	{
+        //        obj_sep.html("<td colspan=11 align='center'>" + "<b>" + mark + x + " (" + count + "譜面)</b></td>");
+        //    }
+        //    obj_sep = $("<tr class='tr_separate' id='" + mark + info[i].level + "'></tr>");
+        //    obj_sep.appendTo(obj);
+        //    count = 0;
+        //    x = info[i].level;
+        //}
 
         // 本文
         let str = $("<tr class='tr_normal'></tr>");
