@@ -1,5 +1,39 @@
 ﻿@charset "utf-8";
 
+body {
+  background-color: #ffffff;
+}
+
+.home-icon img {
+  transition: transform 0.2s ease; /* アニメーションの滑らかさ */
+}
+
+.home-icon img:hover {
+  transform: translateX(3px);
+}
+
+/* 表の表示形式 */
+#table_int {
+  margin: 0 auto;
+  border: 0px solid #000;
+  border-collapse: collapse;
+  border-spacing: 1px;
+  background-color: #000;
+}
+#table_int td {
+  padding: 1px;
+  border: 1px solid #000;
+}
+#table_int a {
+  color: #0123bd;
+}
+#table_int a:visited {
+  color: #0b0513
+}
+#table_int a:hover {
+  color: #e6afff;
+}
+
 /* 難易度表用レイアウト */
 body.diff {
   margin: 0px auto 0px auto;
@@ -126,7 +160,7 @@ td[sortable].sort-desc:after, .sortable-column.sort-desc:after {
 /* ボタン用 */
 .table-buttons {
   text-align: center;
-  margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 button {
@@ -139,6 +173,7 @@ button {
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  margin: 5px;
 }
 
 button:hover {
