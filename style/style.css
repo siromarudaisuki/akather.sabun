@@ -1,7 +1,6 @@
 ﻿@charset "utf-8";
 
 /* 難易度表用レイアウト */
-
 body.diff {
   margin: 0px auto 0px auto;
   padding: 0px 0px 0px 0px;
@@ -115,6 +114,13 @@ td[sortable].sort-asc:after, .sortable-column.sort-asc:after {
 td[sortable].sort-desc:after, .sortable-column.sort-desc:after {
   content: '▼'; /* 降順矢印 */
   color: red;
+}
+
+.sortable-text:hover{
+    color: rgb(255, 153, 0);
+}
+.notsortable-text:hover{
+    color: rgb(58, 206, 0);
 }
 
 /* ボタン用 */

@@ -2,215 +2,48 @@
 <html lang="ja">
 
 <head>
-<title>差分置き場</title>
-<!-- icon設定 -->
-<link rel="icon" href="icon/120.png" type="image/png">
-<link rel="apple-touch-icon" sizes="120x120" href="icon/120.png">
+	<title>差分置き場</title>
+	<!-- icon設定 -->
+	<link rel="icon" href="icon/120.png" type="image/png">
+	<link rel="apple-touch-icon" sizes="120x120" href="icon/120.png">
 
-<meta http-equiv="Content-Script-Type" content="text/javascript" />
-<meta http-equiv="Content-Style-Type" content="text/css" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="bmstable" content= "header.json" /> <!--　読み込む難易度表のヘッダファイルをここに指定　-->
-<link href="style/style.css" rel="stylesheet" type="text/css" media="screen,print" />
-<script src="style/jquery-2.0.2.min.js"></script>
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="bmstable" content="header.json" /> <!--　読み込み先の難易度表定義　-->
+	<link href="style/style.css" rel="stylesheet" type="text/css" media="screen,print" />
+	<script src="style/jquery-2.0.2.min.js"></script>
 </head>
 
-
-
 <body>
-<a href="index.html"><img src="icon/24.png" alt="Back Home"title="ホームへ戻る"></a> <!-- /aは終了コード(付け忘れないように) -->
+	<a href="index.html"><img src="icon/24.png" alt="Back Home" title="ホームへ戻る"></a>
 
-<center>
-<strong><span style="font-size: 24pt;">差分置き場</span></strong><br>
-<br>
+	<center>
+		<strong><span style="font-size: 24pt;">差分置き場</span></strong><br>
+		<br>
 
-<strong><span style="font-size: 12pt;">雑に作っただけなので見づらいのは許してください；；</span></strong><br> 
-まいぺーじ<br>
-<a href="http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=mypage&playerid=167171&guestmode=1" target="_blank" rel="noopener noreferrer" >IR</a>
-<a href="https://boku.tachi.ac/u/sdf/games/bms/7K/scores" target="_blank" rel="noopener noreferrer" >Bokutachi</a><br>
-</center>
+		<strong><span style="font-size: 12pt;">雑に作っただけなので見づらいのは許してください；；</span></strong><br>
+		まいぺーじ<br>
+		<a href="http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=mypage&playerid=167171&guestmode=1" target="_blank" rel="noopener noreferrer">IR(故)</a>
+		<a href="https://boku.tachi.ac/u/sdf/games/bms/7K/scores" target="_blank" rel="noopener noreferrer">Bokutachi</a><br>
+	</center>
 
-<br>
+	<br>
 
-<!--　　　　　ここから難易度表本体　　　　　-->
-<div class="tableflame">
-<table align="center" cellspacing="1" cellpadding=2　border="0" bgcolor="#000000" id="table_int">
-</table>
-</div>
+	<div class="tableflame">
+		<table align="center" cellspacing="1" cellpadding="2" border ="1" bgcolor="#000000" id="table_int">
+		</table>
+	</div>
 
+	<script language="javascript" type="module">
+		import { BMSTableController, Constants } from "./bms_table.mjs"
 
-<script language="javascript" type="text/javascript">
-// メニュー開閉
-function menu(tName){
-	let tMenu = document.getElementById(tName).style;
-	if (tMenu.display == 'none')
-	{
-		tMenu.display = "block";
-	}
-	else
-	{
-		tMenu.display = "none";
-	}
-}
-	
-$(document).ready(function() {
-    const bmstableContent = $("meta[name=bmstable]").attr("content");
-
-    let buttonContainer = $("<div class='table-buttons'></div>").insertBefore("#table_int");  
-    let toggleButton = $("<button id='toggleRows'>区切り行を非表示にする</button>").appendTo(buttonContainer);
-    let resetButton = $("<button id='resetTable'>元の状態に戻す</button>").appendTo(buttonContainer).hide(); // 初期状態では非表示
-
-    toggleButton.on("click", function() {
-        let isHidden = $(".tr_separate").is(":hidden");
-        $(".tr_separate").toggle();
-        $(this).text(isHidden ? "区切り行を非表示にする" : "区切り行を表示する");
-    });
-
-    let initialInfo;
-    $.getJSON(bmstableContent, function(header){
-        $.getJSON(header.data_url, function(information){
-            initialInfo = JSON.parse(JSON.stringify(information)); // 深いコピーで保存
-
-            if(header["level"]) {
-                makeBMSTable(information, header.symbol, header["level"]);
-            } else {
-                makeBMSTable(information, header.symbol);
-            }
-        });
-    });
-
-    resetButton.on("click", function() {
-        $("#table_int").html(""); // テーブルをクリア
-        if(initialInfo) {
-            $.getJSON(bmstableContent, function(header){
-                if(header["level"]) {
-                    makeBMSTable(initialInfo, header.symbol, header["level"]);
-                } else {
-                    makeBMSTable(initialInfo, header.symbol);
-                }
-
-				// 初期ボタン表示
-                toggleButton.show();
-                resetButton.hide();
-            });
-        }
-    });
-
-    function makeBMSTable(info, mark, order) {
-        if (typeof order === 'undefined') order = null;
-
-        let obj = $("#table_int");
-        obj.html("");
-
-        let headerRow = $("<tr height='20' style='color:white;background-color:#666666'></tr>");
-        let headers = ["LV", "動画", "譜面", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "差分", "BPM", "total", "追加日時", "コメント"];
-        let sortableIndexes = ["LV", "タイトル(IRリンク)", "作者(敬称略) / 本体リンク", "BPM", "total", "追加日時", "コメント"];
-        let sortState = {};
-        headers.forEach((text, index) => {
-            let headerCell = $("<td align='center'>" + text + "</td>");
-            if (sortableIndexes.includes(text)) {
-                headerCell.attr("sortable", true);
-                headerCell.css("cursor", "pointer");
-                headerCell.on("click", function() {
-                    sortState[index] = !sortState[index];
-                    let rows = obj.find("tr:gt(0)").toArray().sort(comparer(index, text));
-                    if (!sortState[index]) { rows.reverse(); }
-
-                    $(".tr_separate").hide();
-                    $("#toggleRows").hide(); // 区切り非表示ボタンを非表示
-                    resetButton.show(); // 元の状態に戻すボタンを表示
-
-                    headerRow.find("td").removeClass("sort-asc sort-desc");
-                    headerCell.addClass(sortState[index] ? "sort-asc" : "sort-desc");
-
-                    obj.append(rows);
-                });
-            }
-            headerRow.append(headerCell);
-        });
-        headerRow.appendTo(obj);
-
-		function comparer(index, columnName) {
-		    return function(a, b) {
-		        let valA = $(a).children("td").eq(index).html()?.replace(/<\/?[^>]+(>|$)/g, "") || ""; // Remove HTML tags manually
-		        let valB = $(b).children("td").eq(index).html()?.replace(/<\/?[^>]+(>|$)/g, "") || ""; // Remove HTML tags manually
-				// console.log("[" + columnName + "] index:" + index + ", a:" + valA + ", b:" + valB);
-				
-		        // 追加日時カラム専用の処理
-		        if (columnName === "追加日時") {
-		            // "('ω')｡o(?)" を常に最下部に配置する
-            		if (valA === "('ω')｡o(?)" && valB === "('ω')｡o(?)") { return 0; } // 両方が "('ω')｡o(?)" の場合、位置変更なし
-            		if (valA === "('ω')｡o(?)") { return sortState[index] ? 1 : -1; } // 昇順なら1、降順なら-1
-            		if (valB === "('ω')｡o(?)") { return sortState[index] ? -1 : 1; } // 昇順なら-1、降順なら1
-				
-		            // "/" 区切りの日付を比較
-		            let aDateParts = valA.split("/").map(num => parseInt(num) || 0);
-		            let bDateParts = valB.split("/").map(num => parseInt(num) || 0);
-		            let minLen = Math.min(aDateParts.length, bDateParts.length);
-		            for (let i = 0; i < minLen; i++) {
-		                if (aDateParts[i] !== bDateParts[i]) {
-		                    return sortState[headers[columnName]]
-		                        ? aDateParts[i] - bDateParts[i] // 昇順（通常の降順に逆転させる）
-		                        : bDateParts[i] - aDateParts[i]; // 降順（通常の昇順に逆転させる）
-		                }
-		            }
-		            return 0;
-		        }
-		        // 他のカラム処理
-		        else if (columnName === "total") {
-		            // "/" 区切りの最初の値で比較
-		            let valAParts = valA.split("/").map(num => parseFloat(num) || 0);
-		            let valBParts = valB.split("/").map(num => parseFloat(num) || 0);
-					// "?" を常に最下部に配置する
-            		if (valAParts[0] === valBParts[0]) { return 0; }
-            		if (!$.isNumeric(valAParts[0])) { return sortState[index] ? 1 : -1; } // 昇順なら1、降順なら-1
-            		if (!$.isNumeric(valBParts[0])) { return sortState[index] ? -1 : 1; } // 昇順なら-1、降順なら1}
-		            return valAParts[0] - valBParts[0];
-		        } else if ($.isNumeric(valA) && $.isNumeric(valB)) {
-		            return valA - valB;
-		        } else {
-		            return valA.localeCompare(valB);
-		        }
-		    };
-		}
-
-        let obj_sep = null;
-        let x = "", count = 0;
-
-        for (let i = 0; i < info.length; i++) {
-            if (x !== info[i].level) {
-                if (obj_sep !== null) {
-                    obj_sep.html("<td colspan='11' align='center'><b>" + mark + " " + x + " (" + count + "譜面)</b></td>");
-                }
-                obj_sep = $("<tr class='tr_separate' id='" + mark + info[i].level + "'></tr>");
-                obj_sep.appendTo(obj);
-                count = 0;
-                x = info[i].level;
-            }
-
-            let str = $("<tr class='tr_normal'></tr>");
-            if(info[i].state) str = $("<tr class='state" + info[i].state + "'></tr>");
-
-            $("<td width='1%'>" + mark + " " + x + "</td>").appendTo(str);
-            $("<td width='1%' align='center'>" + (info[i].youtube ? "<a href='" + info[i].youtube + "' target='_blank'><img src='style/youtube.gif' border='0' alt='Youtube' /></a>" : "") + "</td>").appendTo(str);
-            $("<td width='1%' align='center'><a href='https://bms-score-viewer.pages.dev/view?md5=" + info[i].md5 + "' target='_blank'>■</a></td>").appendTo(str);
-            $("<td width='13%'><a href='http://www.dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=" + info[i].md5 + "' target='_blank'>" + info[i].title + "</a></td>").appendTo(str);
-            $("<td width='5%'>" + (info[i].artist ? "<a href='" + info[i].url + "' target='_blank'>" + info[i].artist + "</a>" : "") + "</td>").appendTo(str);
-            $("<td width='1%'>" + ((info[i].state == 1) ? "" : "<a href='sabun/★" + info[i].level + " " + info[i].title + ".zip'>" + "DL" + "</a>") + "</td>").appendTo(str);
-            $("<td width='1%'>" + info[i].bpm + "</td>").appendTo(str);
-            $("<td width='1%'>" + info[i].total + "/" + info[i].totalnote + "</td>").appendTo(str);
-            $("<td width='1%'>" + (info[i].year ? (info[i].year + "/" + (info[i].month || 0) + "/" + (info[i].day || 0)) : "<font color='#666666'>('ω')｡o(?)</font>") + "</td>").appendTo(str);
-            $("<td width='10%'>" + info[i].comment + "</td>").appendTo(str);
-
-            str.appendTo(obj);
-            count++;
-        }
-
-        if (obj_sep !== null) {
-            obj_sep.html("<td colspan='11' align='center'><b>" + mark + " " + x + " (" + count + "譜面)</b></td>");
-        }
-    }
-});
-</script>
+		$(document).ready(function ()
+		{
+			const bmstableContent = $("meta[name=bmstable]").attr("content");
+			const controller = new BMSTableController();
+			controller.initialize(bmstableContent);
+		});
+	</script>
 </body>
 </html>
