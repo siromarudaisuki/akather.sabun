@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+
+<head>
+	<title>DarkCloset</title>
+	<!-- icon設定 -->
+	<link rel="icon" href="icon.closet/120.png" type="image/png">
+	<link rel="apple-touch-icon" sizes="120x120" href="icon.closet/120.png">
+
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="bmstable" content="header.closet.json" /> <!--　読み込み先の難易度表定義　-->
+	<link href="style/style.closet.css" rel="stylesheet" type="text/css" media="screen,print" />
+	<script src="style/jquery-2.0.2.min.js"></script>
+</head>
+
+<body>
+	<a href="index.html" class="home-icon"><img src="icon.closet/24.png" alt="Back Home" title="ホームへ戻る"></a>
+
+	<center>
+		<strong><span style="font-size: 24pt;">DarkCloset</span></strong><br>
+		<br>
+		<strong><span style="font-size: 12pt;">表に入れていないローカル差分置き場です</span></strong><br>
+		<strong><span style="font-size: 10pt;">(自分は好きだが、非推奨なもの)</span></strong><br>
+	</center>
+
+	<br>
+
+	<div class="tableflame">
+		<table id="table_int"></table>
+	</div>
+
+	<script language="javascript" type="module">
+		import { BMSTableController, Constants } from "./bms_table.mjs"
+
+		$(document).ready(function ()
+		{
+			const bmstableContent = $("meta[name=bmstable]").attr("content");
+			const controller = new BMSTableController();
+			controller.initialize(bmstableContent);
+		});
+	</script>
+</body>
+</html>

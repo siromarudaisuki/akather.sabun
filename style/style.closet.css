@@ -1,0 +1,196 @@
+﻿@charset "utf-8";
+
+body {
+  color: rgb(216, 253, 225);
+  background-color: #041b03;
+}
+tr.header-row td {
+  background-color: #666666;
+  color: white;
+}
+
+.home-icon img {
+  transition: transform 0.2s ease; /* アニメーションの滑らかさ */
+}
+.home-icon img:hover {
+  transform: translateX(3px);
+}
+
+/* 表の表示形式 */
+#table_int {
+  margin: 0 auto;
+  border: 0px solid #000;
+  border-collapse: collapse;
+  border-spacing: 1px;
+  background-color: #000;
+}
+#table_int td {
+  padding: 1px;
+  border: 1px solid #000;
+}
+
+#table_int a {
+  color: rgb(0, 122, 10);
+}
+#table_int a:visited {
+  color:rgb(58, 0, 85)
+}
+#table_int a:hover {
+  color: #fdc345;
+}
+
+
+/* 難易度表用レイアウト */
+body.diff {
+  margin: 0px auto 0px auto;
+  padding: 0px 0px 0px 0px;
+  text-align: center;
+  background-color: #222222;
+  width: auto;
+  min-width: 900px;
+  line-height: 1.5;
+}
+
+.tableflame {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0px 5px 0px 5px;
+  text-align: center;
+  background-color: #041b03;
+  min-width: 900px;
+}
+
+.tableflame a {
+  color: #0000c0;
+}
+
+.tableflame a:visited {
+  color: #0000c0;
+}
+
+.tr_separate {
+  height: 20px;
+  color: #ffffff;
+  font-size: 16px;
+  text-shadow: 2px 2px 2px #444444;
+  background-color: #aaaaaa;
+}
+
+/* 表内 */
+.tr_normal {
+  background-color: #ffffff;
+  color: #003007
+}
+
+.state1 {
+  background-color: #ffc0cb;
+}
+
+.state2 {
+  background-color: #add8e6;
+}
+
+.state3 {
+  background-color: #90ee90;
+}
+
+.state4 {
+  background-color: #ffff00;
+}
+
+.state5 {
+  background-color: #808080;
+}
+
+.state6 {
+  background-color: #ffa500;
+}
+
+.tableflame table {
+  font-size: 12px;
+}
+
+.tableflame td {
+  table-layout: fixed;
+}
+
+.tableflame tr, a {
+  /*Firefox向け*/
+  -moz-transition-property: color, background-color;
+  -moz-transition-duration: 0.2s;
+  /*Chrome、Safari向け*/
+  -webkit-transition-property: color, background-color;
+  -webkit-transition-duration: 0.2s;
+  /*Opera向け*/
+  -o-transition-property: color, background-color;
+  -o-transition-duration: 0.2s;
+  transition-property: color, background-color;
+  transition-duration: 0.2s;
+}
+
+.tableflame tr.tr_normal:hover {
+  background-color: #70f0f0;
+}
+
+
+/* ソート可能なカラム */
+td[sortable], .sortable-column {
+  position: relative;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+td[sortable]:after, .sortable-column:after {
+  content: '↕'; /* 初期矢印 */
+  position: absolute;
+  right: 5px;
+  color: white;
+}
+
+td[sortable].sort-asc:after, .sortable-column.sort-asc:after {
+  content: '▲'; /* 昇順矢印 */
+  color: blue;
+}
+
+td[sortable].sort-desc:after, .sortable-column.sort-desc:after {
+  content: '▼'; /* 降順矢印 */
+  color: red;
+}
+
+.sortable-text:hover{
+    color: rgb(255, 153, 0);
+}
+.notsortable-text:hover{
+    color: rgb(58, 206, 0);
+}
+
+/* ボタン用 */
+.table-buttons {
+  text-align: center;
+  background-color: #010e05;
+}
+
+button {
+  font-size: 14px;
+  padding: 6px 12px;
+  color: #fff;
+  background: linear-gradient(90deg, #333, #555);
+  border: 1px solid #222;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  margin: 5px;
+}
+
+button:hover {
+  background: linear-gradient(90deg, #555, #777);
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+  transform: scale(1.05);
+}
+
+button:active {
+  background: linear-gradient(90deg, #222, #444);
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.6);
+}
