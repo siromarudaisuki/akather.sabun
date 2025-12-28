@@ -370,7 +370,7 @@ class BMSTableView
 					$("<td width='1%' align='center'>" + (item.youtube ? "<a href='" + item.youtube + "' target='_blank'><img src='style/youtube.gif' border='0' alt='Youtube' /></a>" : "") + "</td>").appendTo(row);
 					$("<td width='1%' align='center'><a href='" + urls.BMS_SCORE_VIEWER + item.md5 + "' target='_blank'>■</a></td>").appendTo(row);
 					$("<td width='13%'><a href='" + urls.LR2_IR_RANKING + item.md5 + "' target='_blank'>" + item.title + "</a></td>").appendTo(row);
-					$("<td width='5%'>" + (item.artist ? "<a href='" + item.url + "' target='_blank'>" + item.artist + "</a>" : "") + "</td>").appendTo(row);
+					$("<td width='5%'>" + (item.artist ? (item.url ? "<a href='" + item.url + "' target='_blank'>" : "") + item.artist + "</a>" : "") + "</td>").appendTo(row);
 					$("<td width='1%'>" + ((item.state == 1) ? "" : "<a href='" + urls.SABUN_DL + item.level + " " + item.title + ".zip'>" + "DL" + "</a>") + "</td>").appendTo(row);
 					$("<td width='1%'>" + item.bpm + "</td>").appendTo(row);
 					$("<td width='1%'>" + item.total + "/" + item.totalnote + "<br/>(T/N=" + ((item.totalnote === 0) ? 0 : (item.total / item.totalnote)).toFixed(4) + ")</td>").appendTo(row);
